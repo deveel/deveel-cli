@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <version>1.0.1</version>
+    <authors>Antonello Provenzano</authors>
+    <owners>Deveel</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>http://github.com/deveel/deveel-cli</projectUrl>
+    <dependencies>
+      <dependency id="deveel-cli" version="1.0.1" />
+      <dependency id="NUnit" version="2.6.0.12054" />
+    </dependencies>
+    <id>deveel-cli-nunit</id>
+    <title>Deveel Command Line Configuration NUnit Tests</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Acceptance tests for the library Deveel Command Line Configuration Utility (deveel-cli).</description>
+    <copyright>Copyright 2010-2012 Deveel</copyright>
+    <tags>command-line console deveel cli configuration</tags>
+  </metadata>
+  <files>
+    <file src="bin\Release\deveel-cli-nunit.dll" target="lib\net20\deveel-cli-nunit.dll" />
+  </files>
+</package>

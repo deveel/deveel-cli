@@ -1,6 +1,12 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 bin
 obj
+*.user
 
 # mstest test results
 TestResults
+/src/deveel-cli/_ReSharper.deveel-cli
+/src/deveel-cli/bin
+/src/deveel-cli/obj
+/src/_ReSharper.deveel-cli.vs2010
+/src/packages
