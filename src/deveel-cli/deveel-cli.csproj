@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Deveel.Configuration</RootNamespace>
     <AssemblyName>deveel-cli</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,20 +46,30 @@
     <Compile Include="Deveel.Configuration\AlreadySelectedException.cs" />
     <Compile Include="Deveel.Configuration\BasicParser.cs" />
     <Compile Include="Deveel.Configuration\CommandLine.cs" />
+    <Compile Include="Deveel.Configuration\CommandLineExtensions.cs" />
     <Compile Include="Deveel.Configuration\GnuParser.cs" />
     <Compile Include="Deveel.Configuration\HelpFormatter.cs" />
+    <Compile Include="Deveel.Configuration\HelpSettings.cs" />
+    <Compile Include="Deveel.Configuration\ICommandLine.cs" />
     <Compile Include="Deveel.Configuration\ICommandLineParser.cs" />
+    <Compile Include="Deveel.Configuration\IHelpFormatter.cs" />
+    <Compile Include="Deveel.Configuration\IOption.cs" />
+    <Compile Include="Deveel.Configuration\IOptionGroup.cs" />
+    <Compile Include="Deveel.Configuration\IOptionValue.cs" />
     <Compile Include="Deveel.Configuration\MissingArgumentException.cs" />
     <Compile Include="Deveel.Configuration\MissingOptionException.cs" />
     <Compile Include="Deveel.Configuration\Option.cs" />
     <Compile Include="Deveel.Configuration\OptionAttribute.cs" />
     <Compile Include="Deveel.Configuration\OptionBuilder.cs" />
+    <Compile Include="Deveel.Configuration\OptionExtensions.cs" />
     <Compile Include="Deveel.Configuration\OptionGroup.cs" />
     <Compile Include="Deveel.Configuration\OptionGroupAttribute.cs" />
+    <Compile Include="Deveel.Configuration\OptionGroupExtensions.cs" />
     <Compile Include="Deveel.Configuration\Options.cs" />
     <Compile Include="Deveel.Configuration\OptionsAttribute.cs" />
     <Compile Include="Deveel.Configuration\OptionType.cs" />
     <Compile Include="Deveel.Configuration\OptionValidator.cs" />
+    <Compile Include="Deveel.Configuration\OptionValue.cs" />
     <Compile Include="Deveel.Configuration\ParseException.cs" />
     <Compile Include="Deveel.Configuration\Parser.cs" />
     <Compile Include="Deveel.Configuration\ParseStyle.cs" />

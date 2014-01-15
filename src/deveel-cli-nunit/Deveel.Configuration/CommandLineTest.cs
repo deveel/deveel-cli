@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+
 using NUnit.Framework;
 
 namespace Deveel.Configuration {
@@ -16,7 +18,7 @@ namespace Deveel.Configuration {
 			Parser parser = new GnuParser(options);
 			CommandLine cl = parser.Parse(args);
 			
-			IDictionary props = cl.GetOptionProperties("D");
+			IDictionary<string, string> props = cl.GetOptionProperties("D");
 			
 			Assert.IsNotNull(props, "null properties");
 			Assert.AreEqual(4, props.Count, "number of properties in " + props);

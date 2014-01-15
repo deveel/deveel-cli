@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Deveel.Configuration {
 	public abstract class Parser : ICommandLineParser {
 		private CommandLine cmd;
 		private Options options;
-		private IList requiredOptions;
+		private IList<string> requiredOptions;
+		private IDictionary<string, OptionValue> values = new Dictionary<string, OptionValue>();
+
 		
 		protected Parser(Options options) {
 			Options = options;
@@ -19,11 +23,11 @@ namespace Deveel.Configuration {
 			set {
 				options = value;
 				if (value != null)
-					requiredOptions = new ArrayList(value.RequiredOptions);
+					requiredOptions = new List<string>(value.RequiredOptions);
 			}
 		}
 
-		protected IList RequiredOptions {
+		protected IList<string> RequiredOptions {
 			get { return requiredOptions; }
 		}
 
@@ -44,10 +48,12 @@ namespace Deveel.Configuration {
 		public CommandLine Parse(string[] arguments, IDictionary properties, bool stopAtNonOption) {
 			if (options == null)
 				return new CommandLine(false);
-			
-			// clear out the data in options in case it's been used before
-			foreach(Option option in options.HelpOptions) {
-				option.ClearValues();
+
+			if (values != null) {
+				// clear out the data in options in case it's been used before
+				foreach (OptionValue option in values.Values) {
+					option.ClearValues();
+				}
 			}
 
 			cmd = new CommandLine(true);
@@ -116,6 +122,18 @@ namespace Deveel.Configuration {
 			return cmd;
 		}
 
+		private OptionValue SafeGetOptionValue(IOption option) {
+			if (values == null)
+				values = new Dictionary<string, OptionValue>();
+
+			OptionValue value;
+			if (!values.TryGetValue(option.Key(), out value)) {
+				values[option.Key()] = value = new OptionValue(option);
+			}
+
+			return value;
+		}
+
 		protected void ProcessProperties(IDictionary properties) {
 			if (properties == null) {
 				return;
@@ -126,25 +144,27 @@ namespace Deveel.Configuration {
 					Option opt = Options.GetOption(option);
 
 					// get the value from the properties instance
-					String value = (string)properties[option];
+					var value = (string)properties[option];
+					OptionValue optValue = null;
+					if (opt.HasArgument()) {
+						optValue = SafeGetOptionValue(opt);
 
-					if (opt.HasArgument) {
-						if (opt.Values == null || opt.Values.Length == 0) {
+						if (optValue.Values == null || !optValue.Values.Any()) {
 							try {
-								opt.AddValueForProcessing(value);
-							} catch (ApplicationException exp) {
+								optValue.AddValueForProcessing(value);
+							} catch (ApplicationException) {
 								// if we cannot add the value don't worry about it
 							}
 						}
-					} else if (String.Compare(value, "yes", true) != 0 &&
-							 String.Compare(value, "true", true) != 0 &&
-							 String.Compare(value, "1", true) != 0) {
+					} else if (String.Compare(value, "yes", StringComparison.OrdinalIgnoreCase) != 0 &&
+							 String.Compare(value, "true", StringComparison.OrdinalIgnoreCase) != 0 &&
+							 String.Compare(value, "1", StringComparison.OrdinalIgnoreCase) != 0) {
 						// if the value is not yes, true or 1 then don't add the
 						// option to the CommandLine
 						break;
 					}
 
-					cmd.AddOption(opt);
+					cmd.AddOption(optValue);
 				}
 			}
 		}
@@ -156,7 +176,7 @@ namespace Deveel.Configuration {
 			}
 		}
 
-		public void ProcessArguments(Option opt, string[] tokens, ref int index) {
+		public void ProcessArguments(OptionValue opt, string[] tokens, ref int index) {
 			// loop until an option is found
 			while (++index < tokens.Length) {
 				String str = tokens[index];
@@ -170,14 +190,14 @@ namespace Deveel.Configuration {
 				// found a value
 				try {
 					opt.AddValueForProcessing(Util.StripLeadingAndTrailingQuotes(str));
-				} catch (ApplicationException exp) {
+				} catch (ApplicationException) {
 					index--;
 					break;
 				}
 			}
 
-			if (opt.Values == null && !opt.HasOptionalArgument) {
-				throw new MissingArgumentException(opt);
+			if (opt.Values == null && !opt.Option.HasOptionalArguments()) {
+				throw new MissingArgumentException(opt.Option);
 			}
 		}
 
@@ -190,28 +210,29 @@ namespace Deveel.Configuration {
 			}
 
 			// get the option represented by arg
-			Option opt = (Option)Options.GetOption(arg).Clone();
+			OptionValue opt = SafeGetOptionValue(Options.GetOption(arg));
 
 			// if the option is a required option remove the option from
 			// the requiredOptions list
-			if (opt.IsRequired) {
-				RequiredOptions.Remove(opt.Key);
+			if (opt.Option.IsRequired) {
+				RequiredOptions.Remove(opt.Option.Key());
 			}
 
 			// if the option is in an OptionGroup make that option the selected
 			// option of the group
-			if (Options.GetOptionGroup(opt) != null) {
-				OptionGroup group = Options.GetOptionGroup(opt);
+			if (Options.GetOptionGroup(opt.Option) != null) {
+				OptionGroup group = Options.GetOptionGroup(opt.Option);
 
 				if (group.IsRequired) {
-					RequiredOptions.Remove(group);
+					foreach (var option in group.Options)
+						RequiredOptions.Remove(option.Key());
 				}
 
-				group.SetSelected(opt);
+				group.SetSelected(opt.Option);
 			}
 
 			// if the option takes an argument value
-			if (opt.HasArgument) {
+			if (opt.Option.HasArgument()) {
 				ProcessArguments(opt, tokens, ref index);
 			}
 

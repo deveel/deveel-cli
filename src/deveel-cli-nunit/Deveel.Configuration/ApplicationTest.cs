@@ -27,7 +27,7 @@ namespace Deveel.Configuration {
 
 			CommandLine line = parser.Parse(args);
 			Assert.IsTrue(line.HasOption("block-size"));
-			Assert.AreEqual(line.GetOptionValue("block-size"), "10");
+			Assert.AreEqual("10", line.GetOptionValue("block-size").Value);
 		}
 
 		[Test]
@@ -67,7 +67,7 @@ namespace Deveel.Configuration {
 			Assert.AreEqual("value1", opts[3]);
 
 			// check single value
-			Assert.AreEqual(line.GetOptionValue("buildfile"), "mybuild.xml");
+			Assert.AreEqual("mybuild.xml", line.GetOptionValue("buildfile").Value);
 
 			// check option
 			Assert.IsTrue(line.HasOption("projecthelp"));
@@ -138,7 +138,7 @@ namespace Deveel.Configuration {
 			CommandLine line = parser.Parse(new String[] { "-e", "println 'hello'" }, true);
 
 			Assert.IsTrue(line.HasOption('e'));
-			Assert.AreEqual("println 'hello'", line.GetOptionValue('e'));
+			Assert.AreEqual("println 'hello'", line.GetOptionValue('e').Value);
 		}
 
 		[Test]
@@ -182,10 +182,7 @@ namespace Deveel.Configuration {
 					AddOption("h", "help", false, "show this usage message.");
 
 			HelpFormatter hf = new HelpFormatter();
-			hf.Options = options;
-			//hf.printHelp(cmdLine, opts);
-			hf.CommandLineSyntax = cmdLine;
-			hf.PrintHelp();
+			hf.PrintHelp(options, new HelpSettings {CommandLineSyntax = cmdLine}, Console.Out, false);
 		}
 
 	}

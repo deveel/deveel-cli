@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace Deveel.Configuration {
 	[Serializable]
 	public class Options {
-		private readonly IDictionary shortOpts = new Hashtable();
+		private readonly IDictionary<string, IOption> shortOpts = new Dictionary<string, IOption>();
 		private readonly IDictionary longOpts = new Hashtable();
-		private readonly IList requiredOpts = new ArrayList();
-		private readonly IDictionary optionGroups = new Hashtable();
+		private readonly IList<string> requiredOpts = new List<string>();
+		private readonly IDictionary<string, IOptionGroup> optionGroups = new Dictionary<string, IOptionGroup>();
 
-		public Options AddOptionGroup(OptionGroup group) {
-			if (group.IsRequired)
-				requiredOpts.Add(group);
+		public Options AddOptionGroup(IOptionGroup group) {
+			if (group.IsRequired) {
+				foreach (var option in group.Options) {
+					requiredOpts.Add(option.Key());
+				}
+			}
 
 			foreach(Option option in group.Options) {
 				// an Option cannot be required if it is in an
@@ -20,14 +27,14 @@ namespace Deveel.Configuration {
 				option.IsRequired = false;
 				AddOption(option);
 
-				optionGroups[option.Key] = group;
+				optionGroups[option.Key()] = group;
 			}
 
 			return this;
 		}
 
-		internal ICollection OptionGroups {
-			get { return new ArrayList(optionGroups.Values); }
+		internal IEnumerable<IOptionGroup> OptionGroups {
+			get { return optionGroups.Values.ToList().AsReadOnly(); }
 		}
 
 		public Options AddOption(string opt, bool hasArg, string description) {
@@ -43,10 +50,10 @@ namespace Deveel.Configuration {
 		}
 
 		public Options AddOption(Option opt) {
-			String key = opt.Key;
+			String key = opt.Key();
 
 			// add it to the long option list
-			if (opt.HasLongName) {
+			if (opt.HasLongName()) {
 				longOpts[opt.LongName] = opt;
 			}
 
@@ -63,22 +70,22 @@ namespace Deveel.Configuration {
 			return this;
 		}
 
-		public ICollection getOptions() {
-			return ArrayList.ReadOnly(HelpOptions);
+		public IEnumerable<IOption> getOptions() {
+			return new ReadOnlyCollection<IOption>(HelpOptions);
 		}
 
-		internal IList HelpOptions {
-			get { return new ArrayList(shortOpts.Values); }
+		internal IList<IOption> HelpOptions {
+			get { return new List<IOption>(shortOpts.Values); }
 		}
 
-		public IList RequiredOptions {
+		public IList<string> RequiredOptions {
 			get { return requiredOpts; }
 		}
 
 		public Option GetOption(String opt) {
 			opt = Util.StripLeadingHyphens(opt);
 
-			if (shortOpts.Contains(opt)) {
+			if (shortOpts.ContainsKey(opt)) {
 				return (Option)shortOpts[opt];
 			}
 
@@ -88,12 +95,16 @@ namespace Deveel.Configuration {
 		public bool HasOption(String opt) {
 			opt = Util.StripLeadingHyphens(opt);
 
-			return shortOpts.Contains(opt) ||
+			return shortOpts.ContainsKey(opt) ||
 			       longOpts.Contains(opt);
 		}
 
-		public OptionGroup GetOptionGroup(Option opt) {
-			return (OptionGroup)optionGroups[opt.Key];
+		public OptionGroup GetOptionGroup(IOption opt) {
+			IOptionGroup group;
+			if (optionGroups.TryGetValue(opt.Key(), out group))
+				return (OptionGroup) group;
+
+			return null;
 		}
 	}
 }

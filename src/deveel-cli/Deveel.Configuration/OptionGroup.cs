@@ -1,36 +1,29 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Deveel.Configuration {
 	[Serializable]
-	public class OptionGroup {
-		private readonly IDictionary optionMap = new Hashtable();
+	public class OptionGroup : IOptionGroup {
+		private readonly IDictionary<string, IOption> optionMap = new Dictionary<string, IOption>();
 		private String selected;
-		private bool required;
 
-		public OptionGroup AddOption(Option option) {
+		public OptionGroup AddOption(IOption option) {
 			// key   - option name
 			// value - the option
-			optionMap[option.Key] = option;
+			optionMap[option.Key()] = option;
 
 			return this;
 		}
 
-		public ICollection Names {
-			get {
-				// the key set is the collection of names
-				return optionMap.Keys;
-			}
-		}
 
-		public ICollection Options {
+		public IEnumerable<IOption> Options {
 			get {
 				// the values are the collection of options
 				return optionMap.Values;
 			}
 		}
 
-		public void SetSelected(Option option) {
+		internal void SetSelected(IOption option) {
 			// if no option has already been selected or the 
 			// same option is being reselected then set the
 			// selected member variable
@@ -45,9 +38,6 @@ namespace Deveel.Configuration {
 			get { return selected; }
 		}
 
-		public bool IsRequired {
-			set { required = value; }
-			get { return required; }
-		}
+		public bool IsRequired { get; set; }
 	}
 }

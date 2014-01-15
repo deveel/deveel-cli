@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -8,11 +8,11 @@ using NUnit.Framework;
 namespace Deveel.Configuration {
 	[TestFixture]
 	public class HelpFormatterTest {
-		private static readonly String EOL = Environment.NewLine;
+		private static readonly String Eol = Environment.NewLine;
 
 		[Test]
 		public void FindWrapPos() {
-			HelpFormatter hf = new HelpFormatter();
+			var hf = new HelpFormatter();
 
 			String text = "This is a test.";
 			//text width should be max 8; the wrap position is 7
@@ -26,18 +26,20 @@ namespace Deveel.Configuration {
 
 		[Test]
 		public void PrintWrapped() {
-			StringBuilder sb = new StringBuilder();
-			HelpFormatter hf = new HelpFormatter();
+			var sb = new StringBuilder();
+			var hf = new HelpFormatter();
 
 			String text = "This is a test.";
 
-			String expected = "This is a" + hf.NewLine + "test.";
-			hf.renderWrappedText(sb, 12, 0, text);
+			var settings = new HelpSettings();
+
+			String expected = "This is a" + settings.NewLine + "test.";
+			hf.RenderWrappedText(settings, sb, 12, 0, text);
 			Assert.AreEqual(expected, sb.ToString(), "single line text");
 
 			sb.Length = 0;
-			expected = "This is a" + hf.NewLine + "    test.";
-			hf.renderWrappedText(sb, 12, 4, text);
+			expected = "This is a" + settings.NewLine + "    test.";
+			hf.RenderWrappedText(settings, sb, 12, 4, text);
 			Assert.AreEqual(expected, sb.ToString(), "single line padded text");
 
 			text = "  -p,--period <PERIOD>  PERIOD is time duration of form " +
@@ -45,113 +47,98 @@ namespace Deveel.Configuration {
 
 			sb.Length = 0;
 			expected = "  -p,--period <PERIOD>  PERIOD is time duration of" +
-			           hf.NewLine +
+			           settings.NewLine +
 			           "                        form DATE[-DATE] where DATE" +
-			           hf.NewLine +
+			           settings.NewLine +
 			           "                        has form YYYY[MM[DD]]";
-			hf.renderWrappedText(sb, 53, 24, text);
+			hf.RenderWrappedText(settings, sb, 53, 24, text);
 			Assert.AreEqual(expected, sb.ToString(), "single line padded text 2");
 
-			text = "aaaa aaaa aaaa" + hf.NewLine +
-			       "aaaaaa" + hf.NewLine +
+			text = "aaaa aaaa aaaa" + settings.NewLine +
+			       "aaaaaa" + settings.NewLine +
 			       "aaaaa";
 
 			expected = text;
 			sb.Length = 0;
-			hf.renderWrappedText(sb, 16, 0, text);
+			hf.RenderWrappedText(settings, sb, 16, 0, text);
 			Assert.AreEqual(expected, sb.ToString(), "multi line text");
 
-			expected = "aaaa aaaa aaaa" + hf.NewLine +
-			           "    aaaaaa" + hf.NewLine +
+			expected = "aaaa aaaa aaaa" + settings.NewLine +
+			           "    aaaaaa" + settings.NewLine +
 			           "    aaaaa";
 			sb.Length = 0;
-			hf.renderWrappedText(sb, 16, 4, text);
+			hf.RenderWrappedText(settings, sb, 16, 4, text);
 			Assert.AreEqual(expected, sb.ToString(), "multi-line padded text");
 		}
 
 		[Test]
 		public void PrintOptions() {
-			StringBuilder sb = new StringBuilder();
-			HelpFormatter hf = new HelpFormatter();
-			int leftPad = 1;
-			int descPad = 3;
+			var sb = new StringBuilder();
+			var hf = new HelpFormatter();
+			const int leftPad = 1;
+			const int descPad = 3;
 			String lpad = hf.createPadding(leftPad);
 			String dpad = hf.createPadding(descPad);
-			Options options = null;
-			String expected = null;
 
-			options = new Options().AddOption("a", false, "aaaa aaaa aaaa aaaa aaaa");
-			expected = lpad + "-a" + dpad + "aaaa aaaa aaaa aaaa aaaa";
-			hf.renderOptions(sb, 60, options, leftPad, descPad);
+			var settings = new HelpSettings();
+
+			Options options = new Options().AddOption("a", false, "aaaa aaaa aaaa aaaa aaaa");
+			string expected = lpad + "-a" + dpad + "aaaa aaaa aaaa aaaa aaaa";
+			hf.RenderOptions(settings, sb, 60, options, leftPad, descPad);
 			Assert.AreEqual(expected, sb.ToString(), "simple non-wrapped option");
 
 			int nextLineTabStop = leftPad + descPad + "-a".Length;
-			expected = lpad + "-a" + dpad + "aaaa aaaa aaaa" + hf.NewLine +
+			expected = lpad + "-a" + dpad + "aaaa aaaa aaaa" + settings.NewLine +
 			           hf.createPadding(nextLineTabStop) + "aaaa aaaa";
 			sb.Length = 0;
-			hf.renderOptions(sb, nextLineTabStop + 17, options, leftPad, descPad);
+			hf.RenderOptions(settings, sb, nextLineTabStop + 17, options, leftPad, descPad);
 			Assert.AreEqual(expected, sb.ToString(), "simple wrapped option");
 
 
 			options = new Options().AddOption("a", "aaa", false, "dddd dddd dddd dddd");
 			expected = lpad + "-a,--aaa" + dpad + "dddd dddd dddd dddd";
 			sb.Length = 0;
-			hf.renderOptions(sb, 60, options, leftPad, descPad);
+			hf.RenderOptions(settings, sb, 60, options, leftPad, descPad);
 			Assert.AreEqual(expected, sb.ToString(), "long non-wrapped option");
 
 			nextLineTabStop = leftPad + descPad + "-a,--aaa".Length;
-			expected = lpad + "-a,--aaa" + dpad + "dddd dddd" + hf.NewLine +
+			expected = lpad + "-a,--aaa" + dpad + "dddd dddd" + settings.NewLine +
 			           hf.createPadding(nextLineTabStop) + "dddd dddd";
 			sb.Length = 0;
-			hf.renderOptions(sb, 25, options, leftPad, descPad);
+			hf.RenderOptions(settings, sb, 25, options, leftPad, descPad);
 			Assert.AreEqual(expected, sb.ToString(), "long wrapped option");
 
 			options = new Options().
 				AddOption("a", "aaa", false, "dddd dddd dddd dddd").
 				AddOption("b", false, "feeee eeee eeee eeee");
-			expected = lpad + "-a,--aaa" + dpad + "dddd dddd" + hf.NewLine +
-			           hf.createPadding(nextLineTabStop) + "dddd dddd" + hf.NewLine +
-			           lpad + "-b      " + dpad + "feeee eeee" + hf.NewLine +
+			expected = lpad + "-a,--aaa" + dpad + "dddd dddd" + settings.NewLine +
+			           hf.createPadding(nextLineTabStop) + "dddd dddd" + settings.NewLine +
+			           lpad + "-b      " + dpad + "feeee eeee" + settings.NewLine +
 			           hf.createPadding(nextLineTabStop) + "eeee eeee";
 			sb.Length = 0;
-			hf.renderOptions(sb, 25, options, leftPad, descPad);
+			hf.RenderOptions(settings, sb, 25, options, leftPad, descPad);
 			Assert.AreEqual(expected, sb.ToString(), "multiple wrapped options");
 		}
 
 		[Test]
 		public void PrintHelpWithEmptySyntax() {
-			HelpFormatter formatter = new HelpFormatter();
-			try {
-				formatter.Options = new Options();
-				formatter.PrintHelp();
-				Assert.Fail("null command line syntax should be rejected");
-			} catch (InvalidOperationException e) {
-				// expected
-			}
-
-			try {
-				formatter.Options = new Options();
-				formatter.CommandLineSyntax = String.Empty;
-				formatter.PrintHelp();
-				Assert.Fail("empty command line syntax should be rejected");
-			} catch (InvalidOperationException e) {
-				// expected
-			}
+			var formatter = new HelpFormatter();
+			Assert.Throws<InvalidOperationException>(() => formatter.PrintHelp(new Options(), new HelpSettings(), Console.Out, false),
+				"null command line syntax should be rejected");
+			Assert.Throws<InvalidOperationException>(
+				() => formatter.PrintHelp(new Options(), new HelpSettings {CommandLineSyntax = String.Empty}, Console.Out, false),
+				"empty command line syntax should be rejected");
 		}
 
 		[Test]
 		public void AutomaticUsage() {
-			HelpFormatter hf = new HelpFormatter();
-			Options options = null;
+			var hf = new HelpFormatter();
 			String expected = "usage: app [-a]";
-			MemoryStream output = new MemoryStream();
-			StreamWriter pw = new StreamWriter(output);
+			var output = new MemoryStream();
+			var pw = new StreamWriter(output);
 
-			options = new Options().AddOption("a", false, "aaaa aaaa aaaa aaaa aaaa");
-			hf.Options = options;
-			hf.Width = 60;
-			hf.CommandLineSyntax = "app";
-			hf.PrintUsage(pw);
+			Options options = new Options().AddOption("a", false, "aaaa aaaa aaaa aaaa aaaa");
+			hf.PrintUsage(options, new HelpSettings{Width = 60, CommandLineSyntax = "app"}, pw);
 			pw.Flush();
 			Assert.AreEqual(expected, Encoding.UTF8.GetString(output.ToArray()).Trim(), "simple auto usage");
 
@@ -159,10 +146,7 @@ namespace Deveel.Configuration {
 			pw = new StreamWriter(output);
 			expected = "usage: app [-a] [-b]";
 			options = new Options().AddOption("a", false, "aaaa aaaa aaaa aaaa aaaa").AddOption("b", false, "bbb");
-			hf.Options = options;
-			hf.CommandLineSyntax = "app";
-			hf.Width = 60;
-			hf.PrintUsage(pw);
+			hf.PrintUsage(options, new HelpSettings {CommandLineSyntax = "app", Width = 60},  pw);
 			pw.Flush();
 			Assert.AreEqual(expected, Encoding.UTF8.GetString(output.ToArray()).Trim(), "simple auto usage");
 		}
@@ -170,49 +154,40 @@ namespace Deveel.Configuration {
 		// This test ensures the options are properly sorted
 		[Test]
 		public void PrintUsage() {
-			Option optionA = new Option("a", "first");
-			Option optionB = new Option("b", "second");
-			Option optionC = new Option("c", "third");
-			Options opts = new Options();
+			var optionA = new Option("a", "first");
+			var optionB = new Option("b", "second");
+			var optionC = new Option("c", "third");
+			var opts = new Options();
 			opts.AddOption(optionA);
 			opts.AddOption(optionB);
 			opts.AddOption(optionC);
-			HelpFormatter helpFormatter = new HelpFormatter();
-			MemoryStream bytesOut = new MemoryStream();
-			StreamWriter printWriter = new StreamWriter(bytesOut);
-			helpFormatter.Options = opts;
-			helpFormatter.Width = 80;
-			helpFormatter.CommandLineSyntax = "app";
-			helpFormatter.PrintUsage(printWriter);
+			var helpFormatter = new HelpFormatter();
+			var bytesOut = new MemoryStream();
+			var printWriter = new StreamWriter(bytesOut);
+			helpFormatter.PrintUsage(opts, new HelpSettings { Width = 80, CommandLineSyntax = "app"},  printWriter);
 			printWriter.Close();
-			Assert.AreEqual("usage: app [-a] [-b] [-c]" + EOL, Encoding.UTF8.GetString(bytesOut.ToArray()));
+			Assert.AreEqual("usage: app [-a] [-b] [-c]" + Eol, Encoding.UTF8.GetString(bytesOut.ToArray()));
 		}
 
 		[Test]
 		public void PrintSortedUsage() {
-			Options opts = new Options();
+			var opts = new Options();
 			opts.AddOption(new Option("a", "first"));
 			opts.AddOption(new Option("b", "second"));
 			opts.AddOption(new Option("c", "third"));
 
-			HelpFormatter helpFormatter = new HelpFormatter();
-			helpFormatter.OptionComparer = new SorterComparer();
+			var helpFormatter = new HelpFormatter();
 
-			StringWriter output = new StringWriter();
-			helpFormatter.Options = opts;
-			helpFormatter.Width = 80;
-			helpFormatter.CommandLineSyntax = "app";
-			helpFormatter.PrintUsage(output);
+			var output = new StringWriter();
+			helpFormatter.PrintUsage(opts, new HelpSettings { Width = 80, CommandLineSyntax = "app", OptionComparer = new SorterComparer()},  output);
 
-			Assert.AreEqual("usage: app [-c] [-b] [-a]" + EOL, output.ToString());
+			Assert.AreEqual("usage: app [-c] [-b] [-a]" + Eol, output.ToString());
 		}
 
-		private class SorterComparer : IComparer {
-			public int Compare(Object o1, Object o2) {
+		private class SorterComparer : IComparer<IOption> {
+			public int Compare(IOption o1, IOption o2) {
 				// reverses the fuctionality of the default comparator
-				Option opt1 = (Option) o1;
-				Option opt2 = (Option) o2;
-				return String.Compare(opt2.Key, opt1.Key, true);
+				return String.Compare(o2.Key(), o1.Key(), StringComparison.OrdinalIgnoreCase);
 			}
 		}
 
@@ -224,15 +199,11 @@ namespace Deveel.Configuration {
 			opts.AddOption(new Option("c", "third"));
 
 			HelpFormatter helpFormatter = new HelpFormatter();
-			helpFormatter.OptionComparer = null;
 
 			StringWriter output = new StringWriter();
-			helpFormatter.Options = opts;
-			helpFormatter.CommandLineSyntax = "app";
-			helpFormatter.Width = 80;
-			helpFormatter.PrintUsage(output);
+			helpFormatter.PrintUsage(opts, new HelpSettings { Width = 80, CommandLineSyntax = "app", OptionComparer = null }, output);
 
-			Assert.AreEqual("usage: app [-a] [-b] [-c]" + EOL, output.ToString());
+			Assert.AreEqual("usage: app [-a] [-b] [-c]" + Eol, output.ToString());
 		}
 
 		[Test]
@@ -248,12 +219,9 @@ namespace Deveel.Configuration {
 			StringWriter output = new StringWriter();
 
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.Options = options;
-			formatter.CommandLineSyntax = "app";
-			formatter.Width = 80;
-			formatter.PrintUsage(output);
+			formatter.PrintUsage(options, new HelpSettings { Width = 80, CommandLineSyntax = "app" }, output);
 
-			Assert.AreEqual("usage: app [-a | -b | -c]" + EOL, output.ToString());
+			Assert.AreEqual("usage: app [-a | -b | -c]" + Eol, output.ToString());
 		}
 
 		[Test]
@@ -270,12 +238,9 @@ namespace Deveel.Configuration {
 			StringWriter output = new StringWriter();
 
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.Options = options;
-			formatter.Width = 80;
-			formatter.CommandLineSyntax = "app";
-			formatter.PrintUsage(output);
+			formatter.PrintUsage(options, new HelpSettings {CommandLineSyntax = "app", Width = 80},  output);
 
-			Assert.AreEqual("usage: app -a | -b | -c" + EOL, output.ToString());
+			Assert.AreEqual("usage: app -a | -b | -c" + Eol, output.ToString());
 		}
 
 		[Test]
@@ -290,13 +255,9 @@ namespace Deveel.Configuration {
 			StringWriter output = new StringWriter();
 
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.ArgumentName = null;
-			formatter.Options = options;
-			formatter.CommandLineSyntax = "app";
-			formatter.Width = 80;
-			formatter.PrintUsage(output);
+			formatter.PrintUsage(options, new HelpSettings {ArgumentName = null, CommandLineSyntax = "app", Width = 80},  output);
 
-			Assert.AreEqual("usage: app -f" + EOL, output.ToString());
+			Assert.AreEqual("usage: app -f" + Eol, output.ToString());
 		}
 
 		[Test]
@@ -308,6 +269,8 @@ namespace Deveel.Configuration {
 			Assert.AreEqual("  foo", formatter.rtrim("  foo  "));
 		}
 
+		/*
+		This seems to be useless...
 		[Test]
 		public void Accessors() {
 			HelpFormatter formatter = new HelpFormatter();
@@ -336,29 +299,33 @@ namespace Deveel.Configuration {
 			formatter.Width = 80;
 			Assert.AreEqual(80, formatter.Width, "width");
 		}
+		*/
 
 		[Test]
 		public void HeaderStartingWithLineSeparator() {
 			// related to Bugzilla #21215
 			Options options = new Options();
 			HelpFormatter formatter = new HelpFormatter();
-			String header = EOL + "Header";
+			String header = Eol + "Header";
 			String footer = "Footer";
 			StringWriter output = new StringWriter();
-			formatter.Options = options;
-			formatter.Width = 80;
-			formatter.Header = header;
-			formatter.Footer = footer;
-			formatter.LeftPadding = 2;
-			formatter.DescriptionPadding = 2;
-			formatter.CommandLineSyntax = "foobar";
-			formatter.PrintHelp(output, true);
+
+			var settings = new HelpSettings {
+				Width = 80,
+				Header = header,
+				Footer = footer,
+				LeftPadding = 2,
+				DescriptionPadding = 2,
+				CommandLineSyntax = "foobar"
+			};
+
+			formatter.PrintHelp(options, settings, output, true);
 			Assert.AreEqual(
-				"usage: foobar" + EOL +
-				"" + EOL +
-				"Header" + EOL +
-				"" + EOL +
-				"Footer" + EOL
+				"usage: foobar" + Eol +
+				"" + Eol +
+				"Header" + Eol +
+				"" + Eol +
+				"Footer" + Eol
 				, output.ToString());
 		}
 
@@ -372,17 +339,20 @@ namespace Deveel.Configuration {
 
 			HelpFormatter formatter = new HelpFormatter();
 			StringWriter output = new StringWriter();
-			formatter.Options = options;
-			formatter.Width = 80;
-			formatter.LeftPadding = 2;
-			formatter.DescriptionPadding = 2;
-			formatter.CommandLineSyntax = "foobar";
-			formatter.PrintHelp(output, true);
+
+			var settings = new HelpSettings {
+				Width = 80,
+				LeftPadding = 2,
+				DescriptionPadding = 2,
+				CommandLineSyntax = "foobar"
+			};
+
+			formatter.PrintHelp(options, settings, output, true);
 			Assert.AreEqual(
-				"usage: foobar [-a] [--bbb] [-c]" + EOL +
-				"  -a,--aaa  aaaaaaa" + EOL +
-				"     --bbb  bbbbbbb" + EOL +
-				"  -c        ccccccc" + EOL
+				"usage: foobar [-a] [--bbb] [-c]" + Eol +
+				"  -a,--aaa  aaaaaaa" + Eol +
+				"     --bbb  bbbbbbb" + Eol +
+				"  -c        ccccccc" + Eol
 				, output.ToString());
 		}
 
@@ -437,17 +407,21 @@ namespace Deveel.Configuration {
 			mOptions.AddOption(configFile);
 
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.ArgumentName = "arg";
+			
 			String EOL = Environment.NewLine;
 			StringWriter output = new StringWriter();
-			formatter.Options = mOptions;
-			formatter.Width = 80;
-			formatter.Header = "header";
-			formatter.Footer = "footer";
-			formatter.DescriptionPadding = 2;
-			formatter.LeftPadding = 2;
-			formatter.CommandLineSyntax = "commandline";
-			formatter.PrintHelp(output, true);
+
+			var settings = new HelpSettings {
+				ArgumentName = "arg",
+				Width = 80,
+				Header = "header",
+				Footer = "footer",
+				DescriptionPadding = 2,
+				LeftPadding = 2,
+				CommandLineSyntax = "commandline"
+			};
+
+			formatter.PrintHelp(mOptions, settings, output, true);
 			Assert.AreEqual(
 				"usage: commandline [-a <arg>] [--config <arg>] [-h] [-l <arg>] [-n] [-r <arg>]" + EOL +
 				"       [-s <arg>] [-t] [-v]" + EOL +

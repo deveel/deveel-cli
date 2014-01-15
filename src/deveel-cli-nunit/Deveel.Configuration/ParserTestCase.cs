@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
 using NUnit.Framework;
 
 namespace Deveel.Configuration {
@@ -40,8 +43,8 @@ namespace Deveel.Configuration {
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
-			Assert.IsTrue(cl.GetOptionValue("b").Equals("toast"), "Confirm arg of -b");
-			Assert.IsTrue(cl.ArgumentList.Count == 2, "Confirm size of extra args");
+			Assert.IsTrue(cl.GetOptionValue("b").Value.Equals("toast"), "Confirm arg of -b");
+			Assert.IsTrue(cl.Arguments.Count() == 2, "Confirm size of extra args");
 		}
 
 		[Test]
@@ -54,9 +57,9 @@ namespace Deveel.Configuration {
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
-			Assert.IsTrue(cl.GetOptionValue("b").Equals("toast"), "Confirm arg of -b");
-			Assert.IsTrue(cl.GetOptionValue("bfile").Equals("toast"), "Confirm arg of --bfile");
-			Assert.IsTrue(cl.ArgumentList.Count == 2, "Confirm size of extra args");
+			Assert.IsTrue(cl.GetOptionValue("b").Value.Equals("toast"), "Confirm arg of -b");
+			Assert.IsTrue(cl.GetOptionValue("bfile").Value.Equals("toast"), "Confirm arg of --bfile");
+			Assert.IsTrue(cl.Arguments.Count() == 2, "Confirm size of extra args");
 		}
 
 		[Test]
@@ -67,15 +70,15 @@ namespace Deveel.Configuration {
 
 			CommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
-			Assert.IsTrue(cl.ArgumentList.Count == 3, "Confirm  3 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
-			cl = parser.Parse( cl.Arguments);
+			cl = parser.Parse( cl.Arguments.ToArray());
 
 			Assert.IsTrue(!cl.HasOption("c"), "Confirm -c is not set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
-			Assert.IsTrue(cl.GetOptionValue("b").Equals("toast"), "Confirm arg of -b");
-			Assert.IsTrue(cl.ArgumentList.Count == 1, "Confirm  1 extra arg: " + cl.ArgumentList.Count);
-			Assert.IsTrue(cl.ArgumentList[0].Equals("foobar"), "Confirm  value of extra arg: " + cl.ArgumentList[0]);
+			Assert.IsTrue(cl.GetOptionValue("b").Value.Equals("toast"), "Confirm arg of -b");
+			Assert.IsTrue(cl.Arguments.Count() == 1, "Confirm  1 extra arg: " + cl.Arguments.Count());
+			Assert.IsTrue(cl.Arguments.First().Equals("foobar"), "Confirm  value of extra arg: " + cl.Arguments.First());
 		}
 
 		[Test]
@@ -86,16 +89,16 @@ namespace Deveel.Configuration {
 
 			CommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
-			Assert.IsTrue(cl.ArgumentList.Count == 3, "Confirm  3 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
 			parser.Options = options;
-			cl = parser.Parse(cl.Arguments);
+			cl = parser.Parse(cl.Arguments.ToArray());
 
 			Assert.IsTrue(!cl.HasOption("c"), "Confirm -c is not set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
-			Assert.IsTrue(cl.GetOptionValue("b").Equals("toast"), "Confirm arg of -b");
-			Assert.IsTrue(cl.ArgumentList.Count == 1, "Confirm  1 extra arg: " + cl.ArgumentList.Count);
-			Assert.IsTrue(cl.ArgumentList[0].Equals("foobar"), "Confirm  value of extra arg: " + cl.ArgumentList[0]);
+			Assert.IsTrue(cl.GetOptionValue("b").Value.Equals("toast"), "Confirm arg of -b");
+			Assert.IsTrue(cl.Arguments.Count() == 1, "Confirm  1 extra arg: " + cl.Arguments.Count());
+			Assert.IsTrue(cl.Arguments.First().Equals("foobar"), "Confirm  value of extra arg: " + cl.Arguments.First());
 		}
 
 		[Test]
@@ -136,7 +139,7 @@ namespace Deveel.Configuration {
 
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(!cl.HasOption("b"), "Confirm -b is not set");
-			Assert.IsTrue(cl.ArgumentList.Count == 2, "Confirm 2 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 2, "Confirm 2 extra args: " + cl.Arguments.Count());
 		}
 
 		[Test]
@@ -150,9 +153,9 @@ namespace Deveel.Configuration {
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
-			Assert.IsTrue(cl.GetOptionValue("b").Equals("-"), "Confirm arg of -b");
-			Assert.IsTrue(cl.ArgumentList.Count == 1, "Confirm 1 extra arg: " + cl.ArgumentList.Count);
-			Assert.IsTrue(cl.ArgumentList[0].Equals("-"), "Confirm value of extra arg: " + cl.ArgumentList[0]);
+			Assert.IsTrue(cl.GetOptionValue("b").Value.Equals("-"), "Confirm arg of -b");
+			Assert.IsTrue(cl.Arguments.Count() == 1, "Confirm 1 extra arg: " + cl.Arguments.Count());
+			Assert.IsTrue(cl.Arguments.First().Equals("-"), "Confirm value of extra arg: " + cl.Arguments.First());
 		}
 
 		[Test]
@@ -164,7 +167,7 @@ namespace Deveel.Configuration {
 
 			CommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
-			Assert.IsTrue(cl.ArgumentList.Count == 3, "Confirm  3 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
 
 		[Test]
@@ -174,8 +177,8 @@ namespace Deveel.Configuration {
 			CommandLine cl = parser.Parse(args, true);
 
 			Assert.IsTrue(cl.HasOption('b'), "Confirm -b is set");
-			Assert.AreEqual("foo", cl.GetOptionValue('b'), "Confirm -b is set");
-			Assert.IsTrue(cl.ArgumentList.Count == 0, "Confirm no extra args: " + cl.ArgumentList.Count);
+			Assert.AreEqual("foo", cl.GetOptionValue('b').Value, "Confirm -b is set");
+			Assert.IsTrue(!cl.Arguments.Any(), "Confirm no extra args: " + cl.Arguments.Count());
 		}
 
 		[Test]
@@ -186,7 +189,7 @@ namespace Deveel.Configuration {
 
 			CommandLine cl = parser.Parse(args, true);
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
-			Assert.IsTrue(cl.ArgumentList.Count == 3, "Confirm  3 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
 
 		[Test]
@@ -199,7 +202,7 @@ namespace Deveel.Configuration {
 
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
 			Assert.IsFalse(cl.HasOption("b"), "Confirm -b is not set");
-			Assert.IsTrue(cl.ArgumentList.Count == 3, "Confirm  3 extra args: " + cl.ArgumentList.Count);
+			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
 
 		[Test]
@@ -207,7 +210,7 @@ namespace Deveel.Configuration {
 			String[] args = new String[] { "-b", "-1" };
 
 			CommandLine cl = parser.Parse(args);
-			Assert.AreEqual("-1", cl.GetOptionValue("b"));
+			Assert.AreEqual("-1", cl.GetOptionValue("b").Value);
 		}
 
 		[Test]
@@ -215,7 +218,7 @@ namespace Deveel.Configuration {
 			String[] args = new String[] { "-b", "-foo" };
 
 			CommandLine cl = parser.Parse(args);
-			Assert.AreEqual("-foo", cl.GetOptionValue("b"));
+			Assert.AreEqual("-foo", cl.GetOptionValue("b").Value);
 		}
 
 		[Test]
@@ -231,7 +234,7 @@ namespace Deveel.Configuration {
 			parser.Options = options;
 			CommandLine cl = parser.Parse(args);
 
-			Assert.AreEqual("bar", cl.GetOptionValue("foo"));
+			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
 
 		[Test]
@@ -247,7 +250,7 @@ namespace Deveel.Configuration {
 			parser.Options = options;
 			CommandLine cl = parser.Parse(args);
 
-			Assert.AreEqual("bar", cl.GetOptionValue("foo"));
+			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
 
 		[Test]
@@ -263,7 +266,7 @@ namespace Deveel.Configuration {
 			parser.Options = options;
 			CommandLine cl = parser.Parse(args);
 
-			Assert.AreEqual("bar", cl.GetOptionValue("foo"));
+			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
 
 		[Test]
@@ -279,7 +282,7 @@ namespace Deveel.Configuration {
 			parser.Options = options;
 			CommandLine cl = parser.Parse(args);
 
-			Assert.AreEqual("bar", cl.GetOptionValue("foo"));
+			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
 
 		[Test]
@@ -302,9 +305,9 @@ namespace Deveel.Configuration {
 			Assert.AreEqual("1.5", values[1], "value 2");
 			Assert.AreEqual("target", values[2], "value 3");
 			Assert.AreEqual("1.5", values[3], "value 4");
-			IList argsleft = cl.ArgumentList;
-			Assert.AreEqual(1, argsleft.Count, "Should be 1 arg left");
-			Assert.AreEqual("foo", argsleft[0], "Expecting foo");
+			IEnumerable<string> argsleft = cl.Arguments;
+			Assert.AreEqual(1, argsleft.Count(), "Should be 1 arg left");
+			Assert.AreEqual("foo", argsleft.First(), "Expecting foo");
 		}
 	}
 }

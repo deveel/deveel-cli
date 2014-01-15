@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Linq;
 
 using NUnit.Framework;
 
 namespace Deveel.Configuration {
 	[TestFixture]
 	public class ArgumentIsOptionTest {
-		private Options options = null;
-		private ICommandLineParser parser = null;
+		private Options options;
+		private ICommandLineParser parser;
 
 		[SetUp]
 		public void SetUp() {
@@ -26,8 +27,8 @@ namespace Deveel.Configuration {
 			CommandLine cl = parser.Parse(args);
 			Assert.IsTrue(cl.HasOption("p"), "Confirm -p is set");
 			Assert.IsTrue(cl.HasOption("attr"), "Confirm -attr is set");
-			Assert.IsTrue(cl.GetOptionValue("attr").Equals("p"), "Confirm arg of -attr");
-			Assert.IsTrue(cl.Arguments.Length == 0, "Confirm all arguments recognized");
+			Assert.IsTrue(cl.GetOptionValue("attr").Value.Equals("p"), "Confirm arg of -attr");
+			Assert.IsTrue(!cl.Arguments.Any(), "Confirm all arguments recognized");
 		}
 
 		[Test]
@@ -37,8 +38,8 @@ namespace Deveel.Configuration {
 			CommandLine cl = parser.Parse(args);
 			Assert.IsFalse(cl.HasOption("p"), "Confirm -p is set");
 			Assert.IsTrue(cl.HasOption("attr"), "Confirm -attr is set");
-			Assert.IsTrue(cl.GetOptionValue("attr").Equals("p"), "Confirm arg of -attr");
-			Assert.IsTrue(cl.Arguments.Length == 0, "Confirm all arguments recognized");
+			Assert.IsTrue(cl.GetOptionValue("attr").Value.Equals("p"), "Confirm arg of -attr");
+			Assert.IsTrue(!cl.Arguments.Any(), "Confirm all arguments recognized");
 		}
 
 		[Test]
@@ -48,7 +49,7 @@ namespace Deveel.Configuration {
 			CommandLine cl = parser.Parse(args);
 			Assert.IsTrue(cl.HasOption("p"), "Confirm -p is set");
 			Assert.IsFalse(cl.HasOption("attr"), "Confirm -attr is not set");
-			Assert.IsTrue(cl.Arguments.Length == 0, "Confirm all arguments recognized");
+			Assert.IsTrue(!cl.Arguments.Any(), "Confirm all arguments recognized");
 		}
 	}
 }

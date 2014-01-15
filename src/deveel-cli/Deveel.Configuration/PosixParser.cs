@@ -76,7 +76,7 @@ namespace Deveel.Configuration {
 		}
 
 		private void ProcessNonOptionToken(String value, bool stopAtNonOption) {
-			if (stopAtNonOption && (currentOption == null || !currentOption.HasArgument)) {
+			if (stopAtNonOption && (currentOption == null || !currentOption.HasArgument())) {
 				eatTheRest = true;
 				tokens.Add("--");
 			}
@@ -104,7 +104,7 @@ namespace Deveel.Configuration {
 					tokens.Add("-" + ch);
 					currentOption = Options.GetOption(ch);
 
-					if (currentOption.HasArgument && (token.Length != (i + 1))) {
+					if (currentOption.HasArgument() && (token.Length != (i + 1))) {
 						tokens.Add(token.Substring(i + 1));
 
 						break;
