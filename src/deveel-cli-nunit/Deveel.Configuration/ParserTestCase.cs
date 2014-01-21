@@ -68,7 +68,7 @@ namespace Deveel.Configuration {
                                        "foobar",
                                        "-b", "toast" };
 
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
@@ -87,7 +87,7 @@ namespace Deveel.Configuration {
                                        "foobar",
                                        "--bfile", "toast" };
 
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
@@ -165,7 +165,7 @@ namespace Deveel.Configuration {
                                        "-b",
                                        "toast" };
 
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
@@ -174,7 +174,7 @@ namespace Deveel.Configuration {
 		public void StopAtExpectedArg() {
 			String[] args = new String[] { "-b", "foo" };
 
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 
 			Assert.IsTrue(cl.HasOption('b'), "Confirm -b is set");
 			Assert.AreEqual("foo", cl.GetOptionValue('b').Value, "Confirm -b is set");
@@ -187,7 +187,7 @@ namespace Deveel.Configuration {
                                      "-a",
                                      "-btoast"};
 
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
@@ -198,7 +198,7 @@ namespace Deveel.Configuration {
                                      "-abtoast",
                                      "--b=bar"};
 			
-			CommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(args, true);
 
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
 			Assert.IsFalse(cl.HasOption("b"), "Confirm -b is not set");
@@ -229,7 +229,7 @@ namespace Deveel.Configuration {
 			String[] args = new String[] { "-f=bar" };
 
 			Options options = new Options();
-			options.AddOption(OptionBuilder.New().WithLongName("foo").HasArgument().Create('f'));
+			options.AddOption(OptionBuilder.New().WithLongName("foo").WithValueSeparator('=').HasArgument().Create('f'));
 
 			parser.Options = options;
 			CommandLine cl = parser.Parse(args);

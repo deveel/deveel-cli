@@ -25,7 +25,7 @@ namespace Deveel.Configuration {
 			// create the command line parser
 			ICommandLineParser parser = new PosixParser(options);
 
-			CommandLine line = parser.Parse(args);
+			ICommandLine line = parser.Parse(args);
 			Assert.IsTrue(line.HasOption("block-size"));
 			Assert.AreEqual("10", line.GetOptionValue("block-size").Value);
 		}
@@ -57,7 +57,7 @@ namespace Deveel.Configuration {
 			// use the GNU parser
 			ICommandLineParser parser = new GnuParser(options);
 
-			CommandLine line = parser.Parse(args);
+			ICommandLine line = parser.Parse(args);
 
 			// check multiple values
 			String[] opts = line.GetOptionValues("D");
@@ -135,7 +135,7 @@ namespace Deveel.Configuration {
 				.Create('a'));
 
 			Parser parser = new PosixParser(options);
-			CommandLine line = parser.Parse(new String[] { "-e", "println 'hello'" }, true);
+			ICommandLine line = parser.Parse(new String[] { "-e", "println 'hello'" }, true);
 
 			Assert.IsTrue(line.HasOption('e'));
 			Assert.AreEqual("println 'hello'", line.GetOptionValue('e').Value);
