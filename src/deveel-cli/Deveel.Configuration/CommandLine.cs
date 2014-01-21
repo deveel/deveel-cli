@@ -36,7 +36,16 @@ namespace Deveel.Configuration {
 		}
 
 		public IOptionValue GetOptionValue(string optionName) {
-			return options.FirstOrDefault(x => x.Option.Key() == optionName);
+			var option = options.FirstOrDefault(x => x.Option.Name == optionName || x.Option.LongName == optionName);
+			if (option == null)
+				return null;
+
+			var optionValue = new OptionValue(option.Option);
+			foreach (var value in options.Where(x => x.Option.Name == optionName || x.Option.LongName == optionName)) {
+				optionValue.AddValues(value.Values);
+			}
+
+			return optionValue;
 		}
 	}
 }

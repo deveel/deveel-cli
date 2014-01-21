@@ -31,18 +31,119 @@ namespace Deveel.Configuration {
 			return commandLine.GetOptionValue(optionName.ToString(CultureInfo.InvariantCulture));
 		}
 
+		public static T GetValue<T>(this ICommandLine commandLine, string optionName) {
+			return GetValue<T>(commandLine, optionName, default(T));
+		}
+
+		public static T GetValue<T>(this ICommandLine commandLine, string optionName, T defaultValue) {
+			var optionValue = commandLine.GetOptionValue(optionName);
+			if (optionValue == null)
+				return defaultValue;
+
+			var value = optionValue.Value;
+			if (String.IsNullOrEmpty(value))
+				return defaultValue;
+
+			object returnValue = value;
+			if (!(returnValue is T))
+				returnValue = Convert.ChangeType(returnValue, typeof(T), CultureInfo.InvariantCulture);
+
+			return (T)returnValue;			
+		}
+
+		public static string GetString(this ICommandLine commandLine, string optionName) {
+			return commandLine.GetString(optionName, null);
+		}
+
+		public static string GetString(this ICommandLine commandLine, string optionName, string defaultValue) {
+			return commandLine.GetValue(optionName, defaultValue);
+		}
+
+		public static byte GetByte(this ICommandLine commandLine, string optionName) {
+			return commandLine.GetByte(optionName, 0);
+		}
+
+		public static byte GetByte(this ICommandLine commandLine, string optionName, byte defaultValue) {
+			return commandLine.GetValue<byte>(optionName, defaultValue);
+		}
+
+		[CLSCompliant(false)]
+		public static sbyte GetSByte(this ICommandLine commandLine, string optionName) {
+			return GetSByte(commandLine, optionName, 0);
+		}
+
+		[CLSCompliant(false)]
+		public static sbyte GetSByte(this ICommandLine commandLine, string optionName, sbyte defaultValue) {
+			return commandLine.GetValue(optionName, defaultValue);
+		}
+
+		public static short GetInt16(this ICommandLine commandLine, string optionName) {
+			return GetInt16(commandLine, optionName, 0);
+		}
+
+		public static short GetInt16(this ICommandLine commandLine, string optionName, short defaultValue) {
+			return commandLine.GetValue(optionName, defaultValue);
+		}
+
+		public static int GetInt32(this ICommandLine commandLine, string optionName) {
+			return GetInt32(commandLine, optionName, 0);
+		}
+
+		public static int GetInt32(this ICommandLine commandLine, string optionName, int defaultValue) {
+			return commandLine.GetValue<int>(optionName, defaultValue);
+		}
+
+		public static long GetInt64(this ICommandLine commandLine, string optionName) {
+			return GetInt64(commandLine, optionName, 0);
+		}
+
+		public static long GetInt64(this ICommandLine commandLine, string optionName, long defaultValue) {
+			return commandLine.GetValue<long>(optionName, defaultValue);
+		}
+
+		public static float GetSingle(this ICommandLine commandLine, string optionName, float defaultValue) {
+			return commandLine.GetValue<float>(optionName, defaultValue);
+		}
+
+		public static float GetSingle(this ICommandLine commandLine, string optionName) {
+			return GetSingle(commandLine, optionName, 0);
+		}
+
+		public static double GetDouble(this ICommandLine commandLine, string optionName) {
+			return GetDouble(commandLine, optionName, 0);
+		}
+
+		public static double GetDouble(this ICommandLine commandLine, string optionName, double defaultValue) {
+			return commandLine.GetValue<double>(optionName, defaultValue);
+		}
+
+		public static decimal GetDecimal(this ICommandLine commandLine, string optionName) {
+			return GetDecimal(commandLine, optionName, 0);
+		}
+
+		public static decimal GetDecimal(this ICommandLine commandLine, string optionName, decimal defaultValue) {
+			return commandLine.GetValue<decimal>(optionName, defaultValue);
+		}
+
+		public static DateTime GetDateTime(this ICommandLine commandLine, string optionName) {
+			return GetDateTime(commandLine, optionName, DateTime.MinValue);
+		}
+
+		public static DateTime GetDateTime(this ICommandLine commandLine, string optionName, DateTime defaultValue) {
+			return commandLine.GetValue(optionName, defaultValue);
+		}
+
+		public static TimeSpan GetTimeSpan(this ICommandLine commandLine, string optionName) {
+			return GetTimeSpan(commandLine, optionName, TimeSpan.MinValue);
+		}
+
+		public static TimeSpan GetTimeSpan(this ICommandLine commandLine, string optionName, TimeSpan defaultValue) {
+			return commandLine.GetValue(optionName, defaultValue);
+		}
+
 		public static string[] GetOptionValues(this ICommandLine commandLine, string optionName) {
-			List<string> values = new List<string>();
-
-			foreach (IOption option in commandLine.Options) {
-				if (optionName.Equals(option.Name) ||
-					optionName.Equals(option.LongName)) {
-					var value = commandLine.GetOptionValue(optionName);
-					values.AddRange(value.Values);
-				}
-			}
-
-			return values.Count == 0 ? null : values.ToArray();
+			var optionValue = commandLine.GetOptionValue(optionName);
+			return optionValue == null ? null : optionValue.Values.ToArray();
 		}
 
 		public static string[] GetOptionValues(this ICommandLine commandLine, char optionName) {

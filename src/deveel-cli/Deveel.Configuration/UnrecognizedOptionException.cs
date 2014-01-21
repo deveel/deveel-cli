@@ -2,19 +2,15 @@
 
 namespace Deveel.Configuration {
 	public class UnrecognizedOptionException : ParseException {
-		private readonly String option;
-
-		public UnrecognizedOptionException(String message)
+		public UnrecognizedOptionException(string message)
 			: base(message) {
 		}
 
-		public UnrecognizedOptionException(String message, String option)
+		public UnrecognizedOptionException(string message, string option)
 			: this(message) {
-			this.option = option;
+			Option = option;
 		}
 
-		public string Option {
-			get { return option; }
-		}
+		public string Option { get; private set; }
 	}
 }

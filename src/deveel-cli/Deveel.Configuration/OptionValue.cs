@@ -80,5 +80,9 @@ namespace Deveel.Configuration {
 		internal void ClearValues() {
 			values.Clear();
 		}
+
+		internal void AddValues(IEnumerable<string> valuesToAdd) {
+			values.AddRange(valuesToAdd);
+		}
 	}
 }

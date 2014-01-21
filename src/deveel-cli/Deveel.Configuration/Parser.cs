@@ -41,7 +41,7 @@ namespace Deveel.Configuration {
 			return Parse(arguments, properties, false);
 		}
 
-		public CommandLine Parse(string[] arguments, bool stopAtNonOption) {
+		public ICommandLine Parse(string[] arguments, bool stopAtNonOption) {
 			return Parse(arguments, null, stopAtNonOption);
 		}
 
@@ -210,7 +210,7 @@ namespace Deveel.Configuration {
 			}
 
 			// get the option represented by arg
-			OptionValue opt = SafeGetOptionValue(Options.GetOption(arg));
+			OptionValue opt = new OptionValue(Options.GetOption(arg));
 
 			// if the option is a required option remove the option from
 			// the requiredOptions list

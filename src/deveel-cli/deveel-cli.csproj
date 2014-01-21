@@ -47,8 +47,10 @@
     <Compile Include="Deveel.Configuration\BasicParser.cs" />
     <Compile Include="Deveel.Configuration\CommandLine.cs" />
     <Compile Include="Deveel.Configuration\CommandLineExtensions.cs" />
+    <Compile Include="Deveel.Configuration\CommandLineParserExtensions.cs" />
     <Compile Include="Deveel.Configuration\GnuParser.cs" />
     <Compile Include="Deveel.Configuration\HelpFormatter.cs" />
+    <Compile Include="Deveel.Configuration\HelpFormatterExtensions.cs" />
     <Compile Include="Deveel.Configuration\HelpSettings.cs" />
     <Compile Include="Deveel.Configuration\ICommandLine.cs" />
     <Compile Include="Deveel.Configuration\ICommandLineParser.cs" />
