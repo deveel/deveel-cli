@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Microsoft.SqlServer.Server;
-
 namespace Deveel.Configuration {
 	public static class OptionExtensions {
 		internal static string Key(this IOption option) {
@@ -14,6 +12,10 @@ namespace Deveel.Configuration {
 
 		public static bool HasArgument(this IOption option) {
 			return option.ArgumentCount > 0 || option.ArgumentCount == Option.UnlimitedValues;
+		}
+
+		public static bool HasArgumentName(this IOption option) {
+			return !String.IsNullOrEmpty(option.ArgumentName);
 		}
 
 		public static bool HasLongName(this IOption option) {

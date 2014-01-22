@@ -81,21 +81,21 @@ namespace Deveel.Configuration {
 			return this;
 		}
 
-		public OptionBuilder hasOptionalArg() {
+		public OptionBuilder HasOptionalArg() {
 			numberOfArgs = 1;
 			optionalArg = true;
 
 			return this;
 		}
 
-		public OptionBuilder hasOptionalArgs() {
+		public OptionBuilder HasOptionalArgs() {
 			numberOfArgs = Option.UnlimitedValues;
 			optionalArg = true;
 
 			return this;
 		}
 
-		public OptionBuilder hasOptionalArgs(int numArgs) {
+		public OptionBuilder HasOptionalArgs(int numArgs) {
 			numberOfArgs = numArgs;
 			optionalArg = true;
 
@@ -114,11 +114,11 @@ namespace Deveel.Configuration {
 			return this;
 		}
 
-		public Option Create(char opt) {
+		public IOption Create(char opt) {
 			return Create(opt.ToString());
 		}
 
-		public Option Create() {
+		public IOption Create() {
 			if (longopt == null) {
 				Reset();
 				throw new ArgumentException("must specify longopt");
@@ -127,8 +127,8 @@ namespace Deveel.Configuration {
 			return Create(null);
 		}
 
-		public Option Create(String opt) {
-			Option option = null;
+		public IOption Create(String opt) {
+			Option option;
 			try {
 				// create the option
 				option = new Option(opt, description);

@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Deveel.Configuration {
-	public interface ICommandLineParser {
-		Options Options { get; set; }
-				
-		ICommandLine Parse(string[] arguments, bool stopAtNonOption);
+	public interface ICommandLineParser {		
+		ICommandLine Parse(Options options, string[] arguments, IEnumerable<KeyValuePair<string, string>> properties, bool stopAtNonOption);
 	}
 }

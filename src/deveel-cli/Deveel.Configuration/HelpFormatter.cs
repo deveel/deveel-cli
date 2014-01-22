@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Deveel.Configuration {
@@ -33,21 +32,20 @@ namespace Deveel.Configuration {
 				.Append(" ");
 
 			// create a list for processed option groups
-			ArrayList processedGroups = new ArrayList();
+			var processedGroups = new List<IOptionGroup>();
 
 			// temp variable
-			Option option;
 
-			List<IOption> optList = new List<IOption>(options.getOptions());
+			var optList = new List<IOption>(options.AllOptions);
 			optList.Sort(settings.OptionComparer);
 
 			// iterate over the options
 			for (int i = 0; i < optList.Count; i++) {
 				// get the next Option
-				option = (Option) optList[i];
+				var option = (Option) optList[i];
 
 				// check if the option is part of an OptionGroup
-				OptionGroup group = options.GetOptionGroup(option);
+				IOptionGroup group = options.GetOptionGroup(option);
 
 				// if the option is part of a group 
 				if (group != null) {
@@ -80,7 +78,7 @@ namespace Deveel.Configuration {
 			PrintWrapped(settings, writer, buff.ToString().IndexOf(' ') + 1, buff.ToString());
 		}
 
-		private void AppendOptionGroup(HelpSettings settings, StringBuilder buff, OptionGroup group) {
+		private void AppendOptionGroup(HelpSettings settings, StringBuilder buff, IOptionGroup group) {
 			if (!group.IsRequired) {
 				buff.Append("[");
 			}
@@ -170,11 +168,10 @@ namespace Deveel.Configuration {
 			StringBuilder optBuf;
 			ArrayList prefixList = new ArrayList();
 
-			List<IOption> optList = new List<IOption>(options.HelpOptions);
+			var optList = new List<IOption>(options.AllOptions);
 			optList.Sort(settings.OptionComparer);
 
-			for (IEnumerator i = optList.GetEnumerator(); i.MoveNext();) {
-				Option option = (Option) i.Current;
+			foreach (var option in optList) {
 				optBuf = new StringBuilder(8);
 
 				if (option.Name == null) {
@@ -188,7 +185,7 @@ namespace Deveel.Configuration {
 				}
 
 				if (option.HasArgument()) {
-					if (option.HasArgumentName) {
+					if (option.HasArgumentName()) {
 						optBuf.Append(" <").Append(option.ArgumentName).Append(">");
 					} else if (!String.IsNullOrEmpty(settings.ArgumentName)) {
 						optBuf.Append(" <").Append(settings.ArgumentName).Append(">");

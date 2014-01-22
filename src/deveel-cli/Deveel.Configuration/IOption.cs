@@ -15,5 +15,7 @@ namespace Deveel.Configuration {
 		int ArgumentCount { get; }
 
 		char ValueSeparator { get; }
+
+		string ArgumentName { get; }
 	}
 }

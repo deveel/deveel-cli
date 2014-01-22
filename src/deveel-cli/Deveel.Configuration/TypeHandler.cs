@@ -2,7 +2,7 @@
 using System.IO;
 
 namespace Deveel.Configuration {
-	public class TypeHandler {
+	public static class TypeHandler {
 		public static Object CreateValue(string str, OptionType type) {
 			if (type == OptionType.String)
 				return str;

@@ -5,21 +5,14 @@ namespace Deveel.Configuration {
 	public class PosixParser : Parser {
 		private ArrayList tokens = new ArrayList();
 		private bool eatTheRest;
-		private Option currentOption;
+		private IOption currentOption;
 		
-		public PosixParser(Options options)
-			: base(options) {
-		}
-		
-		public PosixParser() {
-		}
-
 		private void Init() {
 			eatTheRest = false;
 			tokens.Clear();
 		}
 
-		protected override String[] Flatten(String[] arguments, bool stopAtNonOption) {
+		protected override String[] Flatten(Options options, string[] arguments, bool stopAtNonOption) {
 			Init();
 
 			int argc = arguments.Length;
@@ -33,10 +26,10 @@ namespace Deveel.Configuration {
 					int pos = token.IndexOf('=');
 					String opt = pos == -1 ? token : token.Substring(0, pos); // --foo
 
-					if (!Options.HasOption(opt)) {
+					if (!options.HasOption(opt)) {
 						ProcessNonOptionToken(token, stopAtNonOption);
 					} else {
-						currentOption = Options.GetOption(opt);
+						currentOption = options.GetOption(opt);
 
 						tokens.Add(opt);
 						if (pos != -1) {
@@ -49,12 +42,12 @@ namespace Deveel.Configuration {
 				else if ("-".Equals(token)) {
 					tokens.Add(token);
 				} else if (token.StartsWith("-")) {
-					if (token.Length == 2 || Options.HasOption(token)) {
-						ProcessOptionToken(token, stopAtNonOption);
+					if (token.Length == 2 || options.HasOption(token)) {
+						ProcessOptionToken(options, token, stopAtNonOption);
 					}
 						// requires bursting
 					else {
-						BurstToken(token, stopAtNonOption);
+						BurstToken(options, token, stopAtNonOption);
 					}
 				} else {
 					ProcessNonOptionToken(token, stopAtNonOption);
@@ -84,25 +77,25 @@ namespace Deveel.Configuration {
 			tokens.Add(value);
 		}
 
-		private void ProcessOptionToken(String token, bool stopAtNonOption) {
-			if (stopAtNonOption && !Options.HasOption(token)) {
+		private void ProcessOptionToken(Options options, string token, bool stopAtNonOption) {
+			if (stopAtNonOption && !options.HasOption(token)) {
 				eatTheRest = true;
 			}
 
-			if (Options.HasOption(token)) {
-				currentOption = Options.GetOption(token);
+			if (options.HasOption(token)) {
+				currentOption = options.GetOption(token);
 			}
 
 			tokens.Add(token);
 		}
 
-		protected void BurstToken(String token, bool stopAtNonOption) {
+		protected void BurstToken(Options options, string token, bool stopAtNonOption) {
 			for (int i = 1; i < token.Length; i++) {
 				String ch = token[i].ToString();
 
-				if (Options.HasOption(ch)) {
+				if (options.HasOption(ch)) {
 					tokens.Add("-" + ch);
-					currentOption = Options.GetOption(ch);
+					currentOption = options.GetOption(ch);
 
 					if (currentOption.HasArgument() && (token.Length != (i + 1))) {
 						tokens.Add(token.Substring(i + 1));

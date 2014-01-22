@@ -26,11 +26,11 @@ namespace Deveel.Configuration {
 				.AddOption("c", "copt", false, "turn [c] on or off");
 			
 			if (style == ParserStyle.Basic)
-				parser = new BasicParser(options);
+				parser = new BasicParser();
 			else if (style == ParserStyle.Posix)
-				parser = new PosixParser(options);
+				parser = new PosixParser();
 			else if (style == ParserStyle.Gnu)
-				parser = new GnuParser(options);
+				parser = new GnuParser();
 		}
 
 		[Test]
@@ -39,7 +39,7 @@ namespace Deveel.Configuration {
                                        "-b", "toast",
                                        "foo", "bar" };
 
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
@@ -53,7 +53,7 @@ namespace Deveel.Configuration {
                                        "--bfile", "toast",
                                        "foo", "bar" };
 
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
@@ -68,11 +68,11 @@ namespace Deveel.Configuration {
                                        "foobar",
                                        "-b", "toast" };
 
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
-			cl = parser.Parse( cl.Arguments.ToArray());
+			cl = parser.Parse( options, cl.Arguments.ToArray());
 
 			Assert.IsTrue(!cl.HasOption("c"), "Confirm -c is not set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
@@ -87,12 +87,11 @@ namespace Deveel.Configuration {
                                        "foobar",
                                        "--bfile", "toast" };
 
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 
-			parser.Options = options;
-			cl = parser.Parse(cl.Arguments.ToArray());
+			cl = parser.Parse(options, cl.Arguments.ToArray());
 
 			Assert.IsTrue(!cl.HasOption("c"), "Confirm -c is not set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
@@ -106,7 +105,7 @@ namespace Deveel.Configuration {
 			String[] args = new String[] { "-a", "-d", "-b", "toast", "foo", "bar" };
 
 			try {
-				parser.Parse(args);
+				parser.Parse(options, args);
 				Assert.Fail("UnrecognizedOptionException wasn't thrown");
 			} catch (UnrecognizedOptionException e) {
 				Assert.AreEqual("-d", e.Option);
@@ -120,7 +119,7 @@ namespace Deveel.Configuration {
 			bool caught = false;
 
 			try {
-				parser.Parse(args);
+				parser.Parse(options, args);
 			} catch (MissingArgumentException e) {
 				caught = true;
 				Assert.AreEqual("b", e.Option.Name, "option missing an argument");
@@ -135,7 +134,7 @@ namespace Deveel.Configuration {
                                        "--",
                                        "-b", "toast" };
 
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(!cl.HasOption("b"), "Confirm -b is not set");
@@ -149,7 +148,7 @@ namespace Deveel.Configuration {
                                        "-a",
                                        "-" };
 
-			CommandLine cl = parser.Parse( args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.IsTrue(cl.HasOption("a"), "Confirm -a is set");
 			Assert.IsTrue(cl.HasOption("b"), "Confirm -b is set");
@@ -165,7 +164,7 @@ namespace Deveel.Configuration {
                                        "-b",
                                        "toast" };
 
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 			Assert.IsTrue(cl.HasOption("c"), "Confirm -c is set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
@@ -174,7 +173,7 @@ namespace Deveel.Configuration {
 		public void StopAtExpectedArg() {
 			String[] args = new String[] { "-b", "foo" };
 
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 
 			Assert.IsTrue(cl.HasOption('b'), "Confirm -b is set");
 			Assert.AreEqual("foo", cl.GetOptionValue('b').Value, "Confirm -b is set");
@@ -187,7 +186,7 @@ namespace Deveel.Configuration {
                                      "-a",
                                      "-btoast"};
 
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
 			Assert.IsTrue(cl.Arguments.Count() == 3, "Confirm  3 extra args: " + cl.Arguments.Count());
 		}
@@ -198,7 +197,7 @@ namespace Deveel.Configuration {
                                      "-abtoast",
                                      "--b=bar"};
 			
-			ICommandLine cl = parser.Parse(args, true);
+			ICommandLine cl = parser.Parse(options, args, true);
 
 			Assert.IsFalse(cl.HasOption("a"), "Confirm -a is not set");
 			Assert.IsFalse(cl.HasOption("b"), "Confirm -b is not set");
@@ -209,7 +208,7 @@ namespace Deveel.Configuration {
 		public void NegativeArgument() {
 			String[] args = new String[] { "-b", "-1" };
 
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 			Assert.AreEqual("-1", cl.GetOptionValue("b").Value);
 		}
 
@@ -217,7 +216,7 @@ namespace Deveel.Configuration {
 		public void ArgumentStartingWithHyphen() {
 			String[] args = new String[] { "-b", "-foo" };
 
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 			Assert.AreEqual("-foo", cl.GetOptionValue("b").Value);
 		}
 
@@ -231,8 +230,7 @@ namespace Deveel.Configuration {
 			Options options = new Options();
 			options.AddOption(OptionBuilder.New().WithLongName("foo").WithValueSeparator('=').HasArgument().Create('f'));
 
-			parser.Options = options;
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
@@ -247,8 +245,7 @@ namespace Deveel.Configuration {
 			Options options = new Options();
 			options.AddOption(OptionBuilder.New().WithLongName("foo").HasArgument().Create('f'));
 
-			parser.Options = options;
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
@@ -263,8 +260,7 @@ namespace Deveel.Configuration {
 			Options options = new Options();
 			options.AddOption(OptionBuilder.New().WithLongName("foo").HasArgument().Create('f'));
 
-			parser.Options = options;
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
@@ -279,8 +275,7 @@ namespace Deveel.Configuration {
 			Options options = new Options();
 			options.AddOption(OptionBuilder.New().WithLongName("foo").HasArgument().Create('f'));
 
-			parser.Options = options;
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			Assert.AreEqual("bar", cl.GetOptionValue("foo").Value);
 		}
@@ -295,8 +290,7 @@ namespace Deveel.Configuration {
 			Options options = new Options();
 			options.AddOption(OptionBuilder.New().WithValueSeparator().HasArguments(2).Create('J'));
 
-			parser.Options = options;
-			CommandLine cl = parser.Parse(args);
+			ICommandLine cl = parser.Parse(options, args);
 
 			IList values = cl.GetOptionValues("J");
 			Assert.IsNotNull(values, "null values");

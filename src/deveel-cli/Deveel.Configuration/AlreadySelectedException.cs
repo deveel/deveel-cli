@@ -2,23 +2,22 @@
 
 namespace Deveel.Configuration {
 	public class AlreadySelectedException : ParseException {
-		private readonly OptionGroup group;
-
 		public AlreadySelectedException(String message)
 			: base(message) {
 		}
 
-		public AlreadySelectedException(OptionGroup group, IOption option)
+		public AlreadySelectedException(IOptionGroup group, IOption option, IOption selected)
 			: this("The option '" + option.Key() + "' was specified but an option from this group "
-				   + "has already been selected: '" + group.Selected + "'") {
-			this.group = group;
-			this.Option = option;
+				   + "has already been selected: '" + selected.Key() + "'") {
+			OptionGroup = group;
+			Option = option;
+			SelectedOption = selected;
 		}
 
-		public OptionGroup OptionGroup {
-			get { return group; }
-		}
+		public IOptionGroup OptionGroup { get; private set; }
 
 		public IOption Option { get; private set; }
+
+		public IOption SelectedOption { get; private set; }
 	}
 }

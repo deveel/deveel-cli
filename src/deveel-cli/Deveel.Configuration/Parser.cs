@@ -1,51 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Deveel.Configuration {
 	public abstract class Parser : ICommandLineParser {
 		private CommandLine cmd;
-		private Options options;
-		private IList<string> requiredOptions;
 		private IDictionary<string, OptionValue> values = new Dictionary<string, OptionValue>();
 
-		
-		protected Parser(Options options) {
-			Options = options;
-		}
-		
+				
 		protected Parser() {
 		}
 
-		public Options Options {
-			get { return options; }
-			set {
-				options = value;
-				if (value != null)
-					requiredOptions = new List<string>(value.RequiredOptions);
-			}
-		}
+		protected abstract String[] Flatten(Options options, string[] arguments, bool stopAtNonOption);
 
-		protected IList<string> RequiredOptions {
-			get { return requiredOptions; }
-		}
-
-		protected abstract String[] Flatten(string[] arguments, bool stopAtNonOption);
-
-		public CommandLine Parse(string[] arguments) {
-			return Parse(arguments, null, false);
-		}
-
-		public CommandLine Parse(string[] arguments, IDictionary properties) {
-			return Parse(arguments, properties, false);
-		}
-
-		public ICommandLine Parse(string[] arguments, bool stopAtNonOption) {
-			return Parse(arguments, null, stopAtNonOption);
-		}
-
-		public CommandLine Parse(string[] arguments, IDictionary properties, bool stopAtNonOption) {
+		public ICommandLine Parse(Options options, string[] arguments, IEnumerable<KeyValuePair<string, string>> properties, bool stopAtNonOption) {
 			if (options == null)
 				return new CommandLine(false);
 
@@ -63,7 +31,7 @@ namespace Deveel.Configuration {
 			if (arguments == null)
 				arguments = new string[0];
 
-			string[] tokenList = Flatten(arguments, stopAtNonOption);
+			string[] tokenList = Flatten(options, arguments, stopAtNonOption);
 
 			int tokenCount = tokenList.Length;
 
@@ -86,11 +54,11 @@ namespace Deveel.Configuration {
 
 				// the value is an option
 				else if (t.StartsWith("-")) {
-					if (stopAtNonOption && !Options.HasOption(t)) {
+					if (stopAtNonOption && !options.HasOption(t)) {
 						eatTheRest = true;
 						cmd.AddArgument(t);
 					} else {
-						ProcessOption(t, tokenList, ref i);
+						ProcessOption(options, t, tokenList, ref i);
 					}
 				}
 
@@ -116,8 +84,8 @@ namespace Deveel.Configuration {
 				}
 			}
 
-			ProcessProperties(properties);
-			CheckRequiredOptions();
+			ProcessProperties(options, properties);
+			CheckRequiredOptions(options);
 
 			return cmd;
 		}
@@ -134,17 +102,17 @@ namespace Deveel.Configuration {
 			return value;
 		}
 
-		protected void ProcessProperties(IDictionary properties) {
+		protected void ProcessProperties(Options options, IEnumerable<KeyValuePair<string, string>> properties) {
 			if (properties == null) {
 				return;
 			}
 
-			foreach (string option in properties.Keys) {
-				if (!cmd.HasOption(option)) {
-					Option opt = Options.GetOption(option);
+			foreach (KeyValuePair<string, string> option in properties) {
+				if (!cmd.HasOption(option.Key)) {
+					IOption opt = options.GetOption(option.Key);
 
 					// get the value from the properties instance
-					var value = (string)properties[option];
+					var value = option.Value;
 					OptionValue optValue = null;
 					if (opt.HasArgument()) {
 						optValue = SafeGetOptionValue(opt);
@@ -169,20 +137,20 @@ namespace Deveel.Configuration {
 			}
 		}
 
-		protected void CheckRequiredOptions() {
+		protected void CheckRequiredOptions(Options options) {
 			// if there are required options that have not been processsed
-			if (RequiredOptions.Count != 0) {
-				throw new MissingOptionException(RequiredOptions);
+			if (options.RequiredOptions.Count != 0) {
+				throw new MissingOptionException(options.RequiredOptions);
 			}
 		}
 
-		public void ProcessArguments(OptionValue opt, string[] tokens, ref int index) {
+		public void ProcessArguments(Options options, OptionValue opt, string[] tokens, ref int index) {
 			// loop until an option is found
 			while (++index < tokens.Length) {
 				String str = tokens[index];
 
 				// found an Option, not an argument
-				if (Options.HasOption(str) && str.StartsWith("-")) {
+				if (options.HasOption(str) && str.StartsWith("-")) {
 					index--;
 					break;
 				}
@@ -201,8 +169,8 @@ namespace Deveel.Configuration {
 			}
 		}
 
-		protected void ProcessOption(string arg, string[] tokens, ref int index) {
-			bool hasOption = Options.HasOption(arg);
+		protected void ProcessOption(Options options, string arg, string[] tokens, ref int index) {
+			bool hasOption = options.HasOption(arg);
 
 			// if there is no option throw an UnrecognisedOptionException
 			if (!hasOption) {
@@ -210,34 +178,47 @@ namespace Deveel.Configuration {
 			}
 
 			// get the option represented by arg
-			OptionValue opt = new OptionValue(Options.GetOption(arg));
+			OptionValue opt = new OptionValue(options.GetOption(arg));
 
 			// if the option is a required option remove the option from
 			// the requiredOptions list
 			if (opt.Option.IsRequired) {
-				RequiredOptions.Remove(opt.Option.Key());
+				options.RequiredOptions.Remove(opt.Option.Key());
 			}
 
 			// if the option is in an OptionGroup make that option the selected
 			// option of the group
-			if (Options.GetOptionGroup(opt.Option) != null) {
-				OptionGroup group = Options.GetOptionGroup(opt.Option);
+			if (options.GetOptionGroup(opt.Option) != null) {
+				IOptionGroup group = options.GetOptionGroup(opt.Option);
 
 				if (group.IsRequired) {
 					foreach (var option in group.Options)
-						RequiredOptions.Remove(option.Key());
+						options.RequiredOptions.Remove(option.Key());
 				}
 
-				group.SetSelected(opt.Option);
+				// group.SetSelected(opt.Option);
+				AssertNotSelected(group, opt.Option);
 			}
 
 			// if the option takes an argument value
 			if (opt.Option.HasArgument()) {
-				ProcessArguments(opt, tokens, ref index);
+				ProcessArguments(options, opt, tokens, ref index);
 			}
 
 			// set the option on the command line
 			cmd.AddOption(opt);
+		}
+
+		private readonly IDictionary<IOptionGroup, IOption> groupSelectedOptions = new Dictionary<IOptionGroup, IOption>();
+
+		private void AssertNotSelected(IOptionGroup group, IOption option) {
+			IOption selectedOption;
+			if (groupSelectedOptions.TryGetValue(group, out selectedOption)) {
+				if (!selectedOption.Key().Equals(option.Key()))
+					throw new AlreadySelectedException(group, option, selectedOption);
+			} else {
+				groupSelectedOptions[group] = option;
+			}
 		}
 
 		public static Parser Create(ParseStyle parseStyle) {

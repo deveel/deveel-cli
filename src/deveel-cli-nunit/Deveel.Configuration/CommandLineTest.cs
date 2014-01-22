@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using NUnit.Framework;
@@ -12,11 +11,11 @@ namespace Deveel.Configuration {
 			string[] args = new String[] { "-Dparam1=value1", "-Dparam2=value2", "-Dparam3", "-Dparam4=value4", "-D", "--property", "foo=bar" };
 			
 			Options options = new Options();
-			options.AddOption(OptionBuilder.New().WithValueSeparator().hasOptionalArgs(2).Create('D'));
+			options.AddOption(OptionBuilder.New().WithValueSeparator().HasOptionalArgs(2).Create('D'));
 			options.AddOption(OptionBuilder.New().WithValueSeparator().HasArguments(2).WithLongName("property").Create());
 			
-			Parser parser = new GnuParser(options);
-			CommandLine cl = parser.Parse(args);
+			Parser parser = new GnuParser();
+			ICommandLine cl = parser.Parse(options, args);
 			
 			IDictionary<string, string> props = cl.GetOptionProperties("D");
 			

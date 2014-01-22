@@ -10,7 +10,7 @@ namespace Deveel.Configuration {
 		private readonly List<IOptionValue> options = new List<IOptionValue>();
 
 		internal CommandLine(bool parsed) {
-			this.HasParsed = parsed;
+			HasParsed = parsed;
 		}
 
 		public bool HasParsed { get; private set; }
@@ -23,7 +23,7 @@ namespace Deveel.Configuration {
 			args.Add(arg);
 		}
 
-		internal void AddOption(OptionValue opt) {
+		internal void AddOption(IOptionValue opt) {
 			options.Add(opt);
 		}
 

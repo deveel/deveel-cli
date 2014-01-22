@@ -38,11 +38,6 @@
     <AssemblyOriginatorKeyFile>deveel-cli.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Deveel.Configuration\AlreadySelectedException.cs" />
     <Compile Include="Deveel.Configuration\BasicParser.cs" />
     <Compile Include="Deveel.Configuration\CommandLine.cs" />
@@ -83,9 +78,11 @@
     <Compile Include="Deveel.Configuration\Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="deveel-cli.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -23,9 +23,9 @@ namespace Deveel.Configuration {
 			String[] args = new String[] { "--block-size=10" };
 
 			// create the command line parser
-			ICommandLineParser parser = new PosixParser(options);
+			ICommandLineParser parser = new PosixParser();
 
-			ICommandLine line = parser.Parse(args);
+			ICommandLine line = parser.Parse(options, args);
 			Assert.IsTrue(line.HasOption("block-size"));
 			Assert.AreEqual("10", line.GetOptionValue("block-size").Value);
 		}
@@ -55,9 +55,9 @@ namespace Deveel.Configuration {
             "-projecthelp" };
 			
 			// use the GNU parser
-			ICommandLineParser parser = new GnuParser(options);
+			ICommandLineParser parser = new GnuParser();
 
-			ICommandLine line = parser.Parse(args);
+			ICommandLine line = parser.Parse(options, args);
 
 			// check multiple values
 			String[] opts = line.GetOptionValues("D");
@@ -111,7 +111,7 @@ namespace Deveel.Configuration {
 				.Create('e'));
 			options.AddOption(
 				OptionBuilder.New().WithArgumentName("extension")
-				.hasOptionalArg()
+				.HasOptionalArg()
 				.WithDescription("modify files in place; create backup if extension is given (e.g. \'.bak\')")
 				.Create('i'));
 			options.AddOption(
@@ -124,18 +124,18 @@ namespace Deveel.Configuration {
 				.Create('p'));
 			options.AddOption(
 				OptionBuilder.New().WithArgumentName("port")
-				.hasOptionalArg()
+				.HasOptionalArg()
 				.WithDescription("listen on a port and process inbound lines")
 				.Create('l'));
 			options.AddOption(
 				OptionBuilder.New().WithArgumentName("splitPattern")
-				.hasOptionalArg()
+				.HasOptionalArg()
 				.WithDescription("split lines using splitPattern (default '\\s') using implicit 'split' variable")
 				.WithLongName("autosplit")
 				.Create('a'));
 
-			Parser parser = new PosixParser(options);
-			ICommandLine line = parser.Parse(new String[] { "-e", "println 'hello'" }, true);
+			Parser parser = new PosixParser();
+			ICommandLine line = parser.Parse(options, new String[] { "-e", "println 'hello'" }, true);
 
 			Assert.IsTrue(line.HasOption('e'));
 			Assert.AreEqual("println 'hello'", line.GetOptionValue('e').Value);
