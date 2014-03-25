@@ -52,6 +52,7 @@
     <Compile Include="Deveel.Configuration\HelpFormatterTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Deveel.Configuration\OptionsObjectTest.cs" />
     <Compile Include="Deveel.Configuration\ParserStyle.cs" />
     <Compile Include="Deveel.Configuration\ParserTestCase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
