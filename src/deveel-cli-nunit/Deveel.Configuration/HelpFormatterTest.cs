@@ -365,31 +365,31 @@ namespace Deveel.Configuration {
 			Option newRun = new Option("n", "new", false, "Create NLT cache entries only for new items");
 			Option trackerRun = new Option("t", "tracker", false, "Create NLT cache entries only for tracker items");
 
-			IOption timeLimit = OptionBuilder.New().WithLongName("limit")
+			Option timeLimit = OptionBuilder.New().WithLongName("limit")
 				.HasArgument()
 				.WithValueSeparator()
 				.WithDescription("Set time limit for execution, in mintues")
 				.Create("l");
 
-			IOption age = OptionBuilder.New().WithLongName("age")
+			Option age = OptionBuilder.New().WithLongName("age")
 				.HasArgument()
 				.WithValueSeparator()
 				.WithDescription("Age (in days) of cache item before being recomputed")
 				.Create("a");
 
-			IOption server = OptionBuilder.New().WithLongName("server")
+			Option server = OptionBuilder.New().WithLongName("server")
 				.HasArgument()
 				.WithValueSeparator()
 				.WithDescription("The NLT server address")
 				.Create("s");
 
-			IOption numResults = OptionBuilder.New().WithLongName("results")
+			Option numResults = OptionBuilder.New().WithLongName("results")
 				.HasArgument()
 				.WithValueSeparator()
 				.WithDescription("Number of results per item")
 				.Create("r");
 
-			IOption configFile = OptionBuilder.New().WithLongName("config")
+			Option configFile = OptionBuilder.New().WithLongName("config")
 				.HasArgument()
 				.WithValueSeparator()
 				.WithDescription("Use the specified configuration file")

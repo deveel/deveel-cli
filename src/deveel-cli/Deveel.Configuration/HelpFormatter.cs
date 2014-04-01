@@ -25,7 +25,7 @@ namespace Deveel.Configuration {
 				PrintWrapped(settings, writer, settings.Footer);
 		}
 
-		public void PrintUsage(Options options, HelpSettings settings, TextWriter writer) {
+		public void PrintUsage(IOptions options, HelpSettings settings, TextWriter writer) {
 			// initialise the string buffer
 			StringBuilder buff = new StringBuilder(settings.SyntaxPrefix)
 				.Append(settings.CommandLineSyntax)
@@ -156,7 +156,7 @@ namespace Deveel.Configuration {
 
 		// --------------------------------------------------------------- Protected
 
-		internal StringBuilder RenderOptions(HelpSettings settings, StringBuilder sb, int width, Options options, int leftPad, int descPad) {
+		internal StringBuilder RenderOptions(HelpSettings settings, StringBuilder sb, int width, IOptions options, int leftPad, int descPad) {
 			String lpad = createPadding(leftPad);
 			String dpad = createPadding(descPad);
 

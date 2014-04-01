@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Deveel.Configuration {
 	public class MissingOptionException : ParseException {
-		private readonly IList<string> missingOptions;
+		private readonly IEnumerable<string> missingOptions;
 
 		public MissingOptionException(String message)
 			: base(message) {
 		}
 
-		public MissingOptionException(IList<string> missingOptions)
+		public MissingOptionException(IEnumerable<string> missingOptions)
 			: this(CreateMessage(missingOptions)) {
 			this.missingOptions = missingOptions;
 		}
@@ -19,15 +19,16 @@ namespace Deveel.Configuration {
 		public IList<string> MissingOptions {
 			get { return missingOptions.ToList().AsReadOnly(); }
 		}
+		private static String CreateMessage(IEnumerable<string> missingOptions) {
+			var buff = new StringBuilder("Missing required option ");
+		    var list = new List<string>(missingOptions);
 
-		private static String CreateMessage(IList<string> missingOptions) {
-			StringBuilder buff = new StringBuilder("Missing required option");
-			buff.Append(missingOptions.Count == 1 ? "" : "s");
+			buff.Append(list.Count == 1 ? "" : "s");
 			buff.Append(": ");
 
-			for (int i = 0; i < missingOptions.Count; i++) {
-				buff.Append(missingOptions[i]);
-				if (i < missingOptions.Count - 1) {
+			for (int i = 0; i < list.Count; i++) {
+				buff.Append(list[i]);
+				if (i < list.Count - 1) {
 					buff.Append(", ");
 				}
 			}

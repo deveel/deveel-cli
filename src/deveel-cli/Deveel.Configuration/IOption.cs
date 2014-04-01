@@ -2,20 +2,20 @@
 
 namespace Deveel.Configuration {
 	public interface IOption : IEquatable<IOption> {
-		string Name { get; }
+		string Name { get; set; }
 
-		string LongName { get; }
+		string LongName { get; set; }
 
-		OptionType Type { get; }
+		OptionType Type { get; set; }
 
-		string Description { get;  }
+		string Description { get; set; }
 
-		bool IsRequired { get; }
+		bool IsRequired { get; set; }
 
-		int ArgumentCount { get; }
+		int ArgumentCount { get; set; }
 
-		char ValueSeparator { get; }
+		char ValueSeparator { get; set; }
 
-		string ArgumentName { get; }
+		string ArgumentName { get; set; }
 	}
 }

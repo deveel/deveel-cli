@@ -102,7 +102,7 @@ namespace Deveel.Configuration {
 			return value;
 		}
 
-		protected void ProcessProperties(Options options, IEnumerable<KeyValuePair<string, string>> properties) {
+		protected void ProcessProperties(IOptions options, IEnumerable<KeyValuePair<string, string>> properties) {
 			if (properties == null) {
 				return;
 			}
@@ -144,7 +144,7 @@ namespace Deveel.Configuration {
 			}
 		}
 
-		public void ProcessArguments(Options options, OptionValue opt, string[] tokens, ref int index) {
+	    private void ProcessArguments(IOptions options, OptionValue opt, string[] tokens, ref int index) {
 			// loop until an option is found
 			while (++index < tokens.Length) {
 				String str = tokens[index];
@@ -169,7 +169,7 @@ namespace Deveel.Configuration {
 			}
 		}
 
-		protected void ProcessOption(Options options, string arg, string[] tokens, ref int index) {
+		protected void ProcessOption(IOptions options, string arg, string[] tokens, ref int index) {
 			bool hasOption = options.HasOption(arg);
 
 			// if there is no option throw an UnrecognisedOptionException

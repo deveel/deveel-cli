@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Deveel.Configuration {
 	[Serializable]
@@ -9,19 +7,31 @@ namespace Deveel.Configuration {
 		public const int UnlimitedValues = -2;
 		public const int OptionalArguments = -3;
 
-		private string argName = "arg";
-		private bool optionalArg;
+	    private bool optionalArg;
 
-		public Option(string opt, string description)
+	    public Option(string opt)
+	        : this(opt, null) {
+	    }
+
+	    public Option(string opt, string description)
 			: this(opt, null, false, description) {
 		}
 
-		public Option(string opt, bool hasArg, string description)
+	    public Option(string opt, bool hasArg)
+	        : this(opt, hasArg, null) {
+	    }
+
+	    public Option(string opt, bool hasArg, string description)
 			: this(opt, null, hasArg, description) {
 		}
 
-		public Option(string opt, string longOpt, bool hasArg, string description) {
-			ArgumentCount = Unitialized;
+	    public Option(string opt, string longOpt, string description) 
+            : this(opt, longOpt, false, description) {
+	    }
+
+	    public Option(string opt, string longOpt, bool hasArg, string description) {
+	        ArgumentName = "arg";
+	        ArgumentCount = Unitialized;
 			// ensure that the option is valid
 			OptionValidator.ValidateOption(opt);
 
@@ -35,11 +45,15 @@ namespace Deveel.Configuration {
 			Description = description;
 		}
 
-		public int Id {
+	    public Option() {
+	        ArgumentName = "arg";
+	    }
+
+	    public int Id {
 			get { return this.Key()[0]; }
 		}
 
-		public string Name { get; private set; }
+		public string Name { get; set; }
 
 		public OptionType Type { get; set; }
 
@@ -54,13 +68,10 @@ namespace Deveel.Configuration {
 
 		public bool IsRequired { get; set; }
 
-		public string ArgumentName {
-			set { argName = value; }
-			get { return argName; }
-		}
+	    public string ArgumentName { get; set; }
 
-		public bool HasArgumentName {
-			get { return !string.IsNullOrEmpty(argName); }
+	    public bool HasArgumentName {
+			get { return !string.IsNullOrEmpty(ArgumentName); }
 		}
 
 		public int ArgumentCount { get; set; }

@@ -52,6 +52,7 @@
     <Compile Include="Deveel.Configuration\IHelpFormatter.cs" />
     <Compile Include="Deveel.Configuration\IOption.cs" />
     <Compile Include="Deveel.Configuration\IOptionGroup.cs" />
+    <Compile Include="Deveel.Configuration\IOptions.cs" />
     <Compile Include="Deveel.Configuration\IOptionValue.cs" />
     <Compile Include="Deveel.Configuration\MissingArgumentException.cs" />
     <Compile Include="Deveel.Configuration\MissingOptionException.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Deveel.Configuration\OptionGroupExtensions.cs" />
     <Compile Include="Deveel.Configuration\Options.cs" />
     <Compile Include="Deveel.Configuration\OptionsAttribute.cs" />
+    <Compile Include="Deveel.Configuration\OptionsExtensions.cs" />
     <Compile Include="Deveel.Configuration\OptionType.cs" />
     <Compile Include="Deveel.Configuration\OptionValidator.cs" />
     <Compile Include="Deveel.Configuration\OptionValue.cs" />

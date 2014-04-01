@@ -4,21 +4,30 @@ using System.Linq;
 
 namespace Deveel.Configuration {
 	[Serializable]
-	public class Options {
-		private readonly IDictionary<string, IOption> shortOpts = new Dictionary<string, IOption>();
-		private readonly IDictionary<string, IOption> longOpts = new Dictionary<string, IOption>();
+	public class Options : IOptions {
+		private readonly IDictionary<string, Option> shortOpts = new Dictionary<string, Option>();
+		private readonly IDictionary<string, Option> longOpts = new Dictionary<string, Option>();
 		private readonly IList<string> requiredOpts = new List<string>();
-		private readonly IDictionary<string, IOptionGroup> optionGroups = new Dictionary<string, IOptionGroup>();
+		private readonly IDictionary<string, OptionGroup> optionGroups = new Dictionary<string, OptionGroup>();
 
-		public Options AddOptionGroup(IOptionGroup group) {
+	    IOption IOptions.CreateOption() {
+	        return new Option();
+	    }
+
+	    IOptions IOptions.AddOptionGroup(IOptionGroup group) {
+	        return AddOptionGroup((OptionGroup) group);
+	    }
+
+		public Options AddOptionGroup(OptionGroup group) {
 			if (group.IsRequired) {
 				foreach (var option in group.Options) {
 					requiredOpts.Add(option.Key());
 				}
 			}
 
-			foreach(Option option in group.Options) {
-				// an Option cannot be required if it is in an
+			foreach(var opt in group.Options) {
+			    var option = (Option) opt;
+			    // an Option cannot be required if it is in an
 				// OptionGroup, either the group is required or
 				// nothing is required
 				option.IsRequired = false;
@@ -42,39 +51,51 @@ namespace Deveel.Configuration {
 			return this;
 		}
 
-		public Options AddOption(IOption opt) {
-			String key = opt.Key();
+	    IOptions IOptions.AddOption(IOption option) {
+	        return AddOption((Option) option);
+	    }
+
+		public Options AddOption(Option option) {
+			String key = option.Key();
 
 			// add it to the long option list
-			if (opt.HasLongName()) {
-				longOpts[opt.LongName] = opt;
+			if (option.HasLongName()) {
+				longOpts[option.LongName] = option;
 			}
 
 			// if the option is required add it to the required list
-			if (opt.IsRequired) {
+			if (option.IsRequired) {
 				if (requiredOpts.Contains(key)) {
 					requiredOpts.RemoveAt(requiredOpts.IndexOf(key));
 				}
 				requiredOpts.Add(key);
 			}
 
-			shortOpts[key] = opt;
+			shortOpts[key] = option;
 
 			return this;
 		}
 
-		public IEnumerable<IOption> AllOptions {
+		public IEnumerable<Option> AllOptions {
 			get { return shortOpts.Values.ToList().AsReadOnly(); }
 		}
 
-		public IList<string> RequiredOptions {
+	    IEnumerable<IOption> IOptions.AllOptions {
+	        get { return AllOptions.Cast<IOption>(); }
+	    }
+
+		public ICollection<string> RequiredOptions {
 			get { return requiredOpts; }
 		}
 
-		public IOption GetOption(String opt) {
+	    IOption IOptions.GetOption(string optionNameOrId) {
+	        return GetOption(optionNameOrId);
+	    }
+
+		public Option GetOption(string opt) {
 			opt = Util.StripLeadingHyphens(opt);
 
-			IOption option;
+			Option option;
 			if (shortOpts.TryGetValue(opt, out option))
 				return option;
 
@@ -91,8 +112,12 @@ namespace Deveel.Configuration {
 			       longOpts.ContainsKey(opt);
 		}
 
-		public IOptionGroup GetOptionGroup(IOption opt) {
-			IOptionGroup group;
+	    IOptionGroup IOptions.GetOptionGroup(IOption option) {
+	        return GetOptionGroup((Option) option);
+	    }
+
+		public OptionGroup GetOptionGroup(Option opt) {
+			OptionGroup group;
 			if (optionGroups.TryGetValue(opt.Key(), out group))
 				return group;
 

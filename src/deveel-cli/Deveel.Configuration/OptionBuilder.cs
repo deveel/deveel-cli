@@ -114,11 +114,11 @@ namespace Deveel.Configuration {
 			return this;
 		}
 
-		public IOption Create(char opt) {
+		public Option Create(char opt) {
 			return Create(opt.ToString());
 		}
 
-		public IOption Create() {
+		public Option Create() {
 			if (longopt == null) {
 				Reset();
 				throw new ArgumentException("must specify longopt");
@@ -127,7 +127,7 @@ namespace Deveel.Configuration {
 			return Create(null);
 		}
 
-		public IOption Create(String opt) {
+		public Option Create(String opt) {
 			Option option;
 			try {
 				// create the option

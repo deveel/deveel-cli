@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>deveel-cli</id>
+        <version>1.0.0</version>
+        <authors>Antonello Provenzano</authors>
+        <owners>antonello</owners>
+        <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.txt</licenseUrl>
+        <projectUrl>http://github.com/deveel/deveel-cli</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Deveel CLI was started as the port to .NET/Mono of the Apache Commons-CLI, but evolved later into a more complete framework for helping developers to easily intercept command-line configuration switches from user input.</description>
+        <copyright>(c) 2010-2014 Deveel</copyright>
+        <tags>command-line console configuration cli .NET Mono deveel</tags>
+    </metadata>
+    <files>
+		<file src="..\dist\deveel-cli.dll" target="lib\net35\deveel-cli.dll" />
+	</files>
+</package>
